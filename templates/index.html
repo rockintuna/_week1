@@ -224,7 +224,7 @@
                 // 페이지네이션
                 $("#demo").pagination({
                     pageSize: "7",
-                    dataSource: postList,
+                    dataSource: postList.reverse(),
                     callback: function (data, pagination) {
                         var dataHtml = "<div>";
 
