@@ -43,7 +43,7 @@
 
 <body>
 <div class="sign">
-    <button onclick="window.location.replace('/login_main')">로그인</button>
+    <button onclick="window.location.replace('/login_main')" class="loginBtn">로그인</button>
 </div>
 <div class="container">
     <div class="title">재판하는 존경장님</div>
@@ -178,6 +178,13 @@
 
 <script>
     let postList = null;
+    const userId = '{{ id }}';
+
+    //로그인 했을 경우
+    if (userId) {
+        $('.loginBtn').hide()
+    }
+
 
     //재판받기
     $("#doJudge").click(function () {
