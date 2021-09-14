@@ -96,7 +96,6 @@ def get_post_list():
         post["_id"] = str(post["_id"])
     return jsonify({'posts': posts})
 
-# ObjectId("6140649c1968a3845d44f0d1")
 @app.route('/post', methods=['GET'])
 def get_post():
     post_id_receive = ObjectId(request.args.get("post_id"))
@@ -111,7 +110,6 @@ def add_post():
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
 
-        # post_id_receive = request.form['post_id']
         title_receive = request.form['title']
         content_receive = request.form['content']
         image_receive = request.form['image']
