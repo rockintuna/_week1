@@ -1,5 +1,6 @@
+import bson.errors
 from bson import ObjectId
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, abort
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import jwt
@@ -26,7 +27,7 @@ def main():
             return render_template('index.html', posts=posts, id=user["id"])
         except jwt.ExpiredSignatureError:
             return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-        except jwt.exceptions.DecodeError:
+        except jwt.DecodeError:
             return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
     else:
         return render_template('index.html', posts=posts)
@@ -67,7 +68,7 @@ def login():
     if result is not None:
         payload = {
          'id': id_receive,
-         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
+         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)
         }
 
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
@@ -86,7 +87,7 @@ def get_user_info():
         return jsonify({'result': 'success', 'nickname': userinfo['nick']})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    except jwt.exceptions.DecodeError:
+    except jwt.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 @app.route('/posts', methods=['GET'])
@@ -98,10 +99,13 @@ def get_post_list():
 
 @app.route('/post', methods=['GET'])
 def get_post():
-    post_id_receive = ObjectId(request.args.get("post_id"))
-    post_id_valid_check(post_id_receive)
-    post = db.post.find_one({'post_id':post_id_receive},{'_id':False})
-    return render_template('post.html', post=post)
+    try:
+        post_id_receive = ObjectId(request.args.get("post_id"))
+        post_id_valid_check(post_id_receive)
+        post = db.post.find_one({'post_id': post_id_receive}, {'_id': False})
+        return render_template('post.html', post=post)
+    except bson.errors.InvalidId:
+        abort(404)
 
 @app.route('/post', methods=['POST'])
 def add_post():
@@ -129,7 +133,7 @@ def add_post():
         return jsonify({'msg': '고민이 성공적으로 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    except jwt.exceptions.DecodeError:
+    except jwt.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 @app.route('/comment', methods=['POST'])
@@ -149,7 +153,7 @@ def add_comment():
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    except jwt.exceptions.DecodeError:
+    except jwt.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 @app.route('/post', methods=['DELETE'])
@@ -187,9 +191,13 @@ def unlike_post():
     return jsonify({'msg': '비추천.'})
 
 def post_id_valid_check(post_id):
-    # todo try catch
     if db.post.find_one({'_id': post_id}) is None:
-        raise Exception('존재하지 않는 글 ID 입니다.')
+        abort(404)
+    return
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
    app.run('0.0.0.0',port=5000,debug=True)
