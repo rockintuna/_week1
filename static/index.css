@@ -1,0 +1,112 @@
+* {
+    font-family: "Stylish", sans-serif;
+}
+
+.container {
+    display: block;
+    width: 1200px;
+    /* height: 2000px; */
+    margin: 30px auto;
+    /* background-color: rgba(128, 128, 128, 0.123); */
+}
+
+/* .list-all {
+  display: none;
+} */
+
+.container > .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px auto 50px;
+    height: 200px;
+    width: 90%;
+    font-size: 70px;
+    font-family: "Hahmlet", serif;
+    background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(163, 163, 163, 1) 100%
+    );
+    border: 1px solid gray;
+}
+
+.container .buttons {
+    display: flex;
+    justify-content: space-between;
+    height: 100px;
+    width: 90%;
+    margin: auto;
+}
+
+.container .bests {
+    display: flex;
+    justify-content: space-between;
+    height: 50px;
+    width: 90%;
+    margin: auto;
+}
+
+.container .newList {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 50px auto;
+}
+
+.container .newList > h3 {
+    margin-bottom: 20px;
+}
+
+.container .newList .list-group {
+    width: 100%;
+}
+
+.container .lists {
+    display: flex;
+    width: 90%;
+    margin: auto;
+}
+
+.container .lists .list-group {
+    width: 50%;
+}
+
+.post-container {
+    display: none;
+    width: 90%;
+    margin: auto;
+}
+
+.inputs {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    background-color: white;
+}
+
+.input-title {
+    margin: 50px auto 0;
+    width: 100%;
+    height: 50px;
+}
+
+.input-content {
+    margin: 50px auto;
+    width: 100%;
+    height: 500px;
+}
+
+.paginationjs {
+    display: flex;
+    justify-content: center;
+}
+
+.sign {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    width: 300px;
+    margin: auto;
+    float: right;
+}

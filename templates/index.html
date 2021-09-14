@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+    />
+    <link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"
+    ></script>
+
+    <!-- 구글폰트 -->
+    <link
+            href="https://fonts.googleapis.com/css?family=Hahmlet:wght@900&Stylish&display=swap"
+            rel="stylesheet"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.4/pagination.min.js"></script>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.4/pagination.css"
+    />
+
+    <title>재판하는 존경장님</title>
+
+</head>
+
+<body>
+<div class="sign">
+    <button onclick="window.location.replace('/login')">로그인</button>
+</div>
+<div class="container">
+    <div class="title">재판하는 존경장님</div>
+    <div class="buttons">
+        <button
+                type="button"
+                class="btn btn-light btn-lg btn-block"
+                id="getJudge"
+                style="border: 1px solid black"
+        >
+            재판받기💦
+        </button>
+        <button
+                type="button"
+                class="btn btn-dark btn-lg btn-block"
+                id="doJudge"
+                style="margin-top: 0px"
+        >
+            재판하기👨‍⚖️
+        </button>
+    </div>
+    <!-- 재판하기 리스트 출력 -->
+    <div class="list-all">
+        <div class="newList">
+            <!-- <h3>재판 중</h3> -->
+            <ul class="list-group">
+                <!-- <li
+                  class="
+                    list-group-item
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                  "
+                >
+                  동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?
+                  <span class="badge badge-primary badge-pill">14</span>
+                </li>
+                <li
+                  class="
+                    list-group-item
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                  "
+                >
+                  아몰라 응애
+                  <span class="badge badge-primary badge-pill">2</span>
+                </li>
+                <li
+                  class="
+                    list-group-item
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                  "
+                >
+                  국밥을 시켰는데 밥이 말아져 나왔습니다.
+                  <span class="badge badge-primary badge-pill">1</span>
+                </li>
+                <li
+                  class="
+                    list-group-item
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                  "
+                >
+                  별거아닙니다.
+                  <span class="badge badge-primary badge-pill">0</span>
+                </li>
+                <li
+                  class="
+                    list-group-item
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                  "
+                >
+                  별거아닙니다2
+                  <span class="badge badge-primary badge-pill">0</span>
+                </li> -->
+                <div id="pagination"></div>
+                <div id="demo"></div>
+            </ul>
+        </div>
+        <div class="bests">
+            <button
+                    type="button"
+                    class="btn btn-light btn-lg btn-block"
+                    style="border: 1px solid black"
+            >
+                오늘의 격론💢
+            </button>
+            <button
+                    type="button"
+                    class="btn btn-primary btn-lg btn-block"
+                    style="margin-top: 0px; border: 1px solid black"
+            >
+                이번 주의 격론💥
+            </button>
+        </div>
+        <div class="lists">
+            <ul class="list-group">
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?
+                    <span class="badge badge-primary badge-pill">14</span>
+                </li>
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    아몰라 응애
+                    <span class="badge badge-primary badge-pill">2</span>
+                </li>
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    국밥을 시켰는데 밥이 말아져 나왔습니다.
+                    <span class="badge badge-primary badge-pill">1</span>
+                </li>
+            </ul>
+            <ul class="list-group">
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?
+                    <span class="badge badge-primary badge-pill">14</span>
+                </li>
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    주간 2위
+                    <span class="badge badge-primary badge-pill">5</span>
+                </li>
+                <li
+                        class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+                >
+                    주간 3위
+                    <span class="badge badge-primary badge-pill">3</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 재판받기 리스트 출력 -->
+    <div class="post-container">
+        <div class="inputs">
+            <input class="input-title" placeholder="제목을 입력해주세요"/>
+            <textarea
+                    class="input-content"
+                    placeholder="고민 내용을 입력해주세요"
+            ></textarea>
+        </div>
+        <button style="float: right; margin-bottom: 50px">재판 접수</button>
+    </div>
+</div>
+
+<script>
+    //재판받기
+    $("#doJudge").click(function () {
+        $(".list-all").show();
+        $(".post-container").hide();
+    });
+
+    // 재판하기
+    $("#getJudge").click(function () {
+        $(".list-all").hide();
+        $(".post-container").show();
+    });
+
+    // 페이지네이션
+    $("#demo").pagination({
+        pageSize: "7",
+        dataSource: [
+            {
+                comment: "동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?",
+                like: 14,
+            },
+            {
+                comment: "아몰라 응애",
+                like: 2,
+            },
+            {
+                comment: "국밥을 시켰는데 밥이 말아져 나왔습니다.",
+                like: 1,
+            },
+            {
+                comment: "아몰라 응애",
+                like: 3,
+            },
+            {
+                comment: "별거아닌 고민1",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민2",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민3",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민4",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민5",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민6",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민7",
+                like: 0,
+            },
+            {
+                comment: "별거아닌 고민8",
+                like: 0,
+            },
+        ],
+        callback: function (data, pagination) {
+            var dataHtml = "<div>";
+
+            $.each(data, function (index, item) {
+                dataHtml +=
+                    `<li
+              class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >` +
+                    item["comment"] +
+                    `
+              <span class="badge badge-primary badge-pill">${item["like"]}</span>
+            </li>`;
+            });
+
+            dataHtml += "</div>";
+
+            $("#pagination").html(dataHtml);
+        },
+    });
+</script>
+</body>
+</html>
