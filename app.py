@@ -17,6 +17,11 @@ def main():
         post["_id"] = str(post["_id"])
     return render_template('index.html', posts=posts)
 
+@app.route('/login_main')
+def login_main():
+    msg = request.args.get("msg")
+    return render_template('login.html', msg=msg)
+
 @app.route('/register', methods=['POST'])
 def register_user():
     id_receive = request.form['id']
@@ -81,7 +86,7 @@ def get_post():
     writing_id_receive = request.args.get("writing_id")
     writing_id_valid_check(writing_id_receive)
     post = db.post.find_one({'writing_id':writing_id_receive},{'_id':False})
-    return render_template('detail.html', post=post)
+    return render_template('post.html', post=post)
 
 @app.route('/post', methods=['POST'])
 def add_post():
