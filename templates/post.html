@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>고민 글 작성</title>
+
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- 구글 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <style>
+        .top_banner_title {
+            font-family: 'Black Han Sans', sans-serif;
+            color: black;
+            font-size: 50px;
+        }
+
+        /*포스터 외곽*/
+        /*.whole_post_page {*/
+        /*    width: 1000px;*/
+        /*    margin: 50px auto;*/
+
+        /*    padding: 30px;*/
+        /*    border: solid;*/
+
+        /*}*/
+
+        .article {
+            width: 800px;
+            margin: 30px auto;
+
+            /*테투리로 div 보이게하기*/
+            /*border: solid;*/
+            /*border-radius: 10px;*/
+
+        }
+
+        .article_info {
+            background: beige;
+
+            height: 30px;
+            text-align: center;
+
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+
+        }
+
+        .article_author {
+            float: left;
+            width: 30%;
+        }
+
+        .article_data {
+            margin-left: 30px;
+            float: left;
+            width: 30%;
+        }
+
+        .article_hit {
+            float: right;
+            width: 30%;
+        }
+
+        .article-title {
+            text-align: center;
+            width: 100%;
+            height: 50px;
+            border: 10px;
+        }
+
+        .article-content {
+            width: 800px;
+            height: 500px;
+        }
+
+        .reply-data {
+            font-family: 'Jua', sans-serif;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            //get_list()
+        })
+
+        function get_list() {
+            $.ajax({
+                type: "GET",
+                url: "http://openapi.seoul.go.kr:8088/6d4d776b466c656533356a4b4b5872/json/RealtimeCityAir/1/99",
+                data: {},
+                success: function (response) {
+                    //let rows = response["RealtimeCityAir"]["row"];
+                    console.log(1)
+                }
+            })
+        }
+
+        // 댓글 작성버튼에 대한 이벤트
+        // server 에 댓글을 POST
+        // 현재의 HTML append 작업
+        function PostReply() {
+            let writing_id = '1';
+            let id = '정호';
+            let comment = $('#ReplyComment').val();
+
+            $.ajax({
+                type: "POST",
+                url: '/post',
+                data: {writing_id_receive: writing_id},
+                success: function (response) {
+                    console.log(response['msg'])
+
+                    // 보내주고 refresh 를 통해서 다시 리스트 목록을 불러와야할듯하다.
+                }
+            });
+            window.location.reload();
+
+
+            /*
+            let temp_html = `<li>작성자 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                                <br>
+                                <div>
+                                    ${comment}
+                                </div>
+                                <hr>
+                            </li>`;
+
+            $('#ReplyList').append(temp_html);*/
+        }
+    </script>
+
+
+</head>
+<body>
+<div>
+    <section class="hero is-small is-primary">
+        <div class="hero-body">
+            <p style="text-align: center;">
+                <span class="top_banner_title">고민 글</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="whole_post_page">
+        <div class="article">
+            <!-- 글 정보 -->
+            <div class="article_info">
+                <div class="article_author">
+                    <span>작성자: 김정호</span>
+                </div>
+                <div class="article_data">
+                    <span>2021-09-14</span>
+                </div>
+                <div class="article_hit">
+                    <span>조회: 1 &nbsp;&nbsp;&nbsp; 추천: 100</span>
+                </div>
+            </div>
+
+            <!-- 글 제목 -->
+            <div class="article-title">
+                <span style="font-size:20px;">이것은 제목입니다</span>
+            </div>
+            <hr>
+
+            <!-- 글 상세내용 입니다 -->
+            <div class="article-content">
+                fdsafdasfdas
+            </div>
+
+            <!-- 댓글 리스트 입니다 -->
+            <div class="reply-list">
+                <p>댓글 수 : <strong>17</strong></p>
+                <hr>
+                <div>
+                    <ul class="reply-ul" id="ReplyList">
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                fdas
+                            </div>
+                            <hr>
+                        </li>
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                rewqrewqrewq
+                            </div>
+                            <hr>
+                        </li>
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                fdasfeareasresareas
+                            </div>
+                            <hr>
+                        </li>
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                fdsafear
+                            </div>
+                            <hr>
+                        </li>
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                fdsafdsafdsafdsafasd
+                            </div>
+                            <hr>
+                        </li>
+
+                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                            <br>
+                            <div>
+                                fdsafeasfas
+                            </div>
+                            <hr>
+                        </li>
+
+
+                    </ul>
+                </div>
+            </div>
+
+            <!--  댓글 달기  -->
+            <article class="media">
+                <figure class="media-left">
+                    <p class="image is-64x64">
+                        <img src="/static/image.jfif">
+                    </p>
+                </figure>
+                <div class="media-content">
+                    <div class="field">
+                        <p class="control">
+                            <textarea rows="3" class="textarea" placeholder="댓글을 달아주세요!" id="ReplyComment"></textarea>
+                        </p>
+                    </div>
+                    <nav class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <a class="button is-info" onclick="PostReply()">댓글 작성</a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+</body>
+</html>
