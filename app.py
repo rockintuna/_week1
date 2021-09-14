@@ -37,6 +37,13 @@ def register_user():
     db.users.insert_one(doc)
     return jsonify({'result': 'success'})
 
+@app.route('/register/check_dup', methods=['POST'])
+def check_dup():
+    username_receive = request.form['username_give']
+    exists = bool(db.users.find_one({"username": username_receive}))
+    # print(value_receive, type_receive, exists)
+    return jsonify({'result': 'success', 'exists': exists})
+
 @app.route('/login', methods=['POST'])
 def login():
     id_receive = request.form['id']

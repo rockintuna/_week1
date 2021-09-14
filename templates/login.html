@@ -163,14 +163,14 @@
         }
         $.ajax({
           type: "POST",
-          url: "/register/save",
+          url: "/register",
           data: {
-            username_give: username,
-            password_give: password,
+            id: username,
+            pw: password,
           },
           success: function (response) {
             alert("회원가입을 축하드립니다!");
-            window.location.replace("/login");
+            window.location.replace("/login_main");
           },
         });
       }
