@@ -58,9 +58,7 @@ def login():
          'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
 
-        # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
-        # 3.9
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -109,7 +107,7 @@ def add_post():
         id = db.users.find_one({"id": payload["id"]}, {'_id':False})
 
         doc = {
-            'id': id,
+            'id': id["id"],
             'title': title_receive,
             'content': content_receive,
             'image': image_receive,
