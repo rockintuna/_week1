@@ -117,7 +117,7 @@
             $.ajax({
                 type: "POST",
                 url: '/post',
-                data: {writing_id_receive: writing_id, comment_receive: comment},
+                data: {writing_id_receive: writing_id},
                 success: function (response) {
                     console.log(response['msg'])
 
