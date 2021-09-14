@@ -103,14 +103,18 @@
 }
 
 .sign {
-    display: flex;
-    flex-direction: row;
+
     text-align: center;
-    width: 300px;
-    margin: auto;
+    width: 200px;
+    margin: 0 auto 50px;
     float: right;
 }
 
 .postListOne{
     cursor: pointer;
+}
+
+.username{
+    display: none;
+    font-family: "Hahmlet", serif;
 }
