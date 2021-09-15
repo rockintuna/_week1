@@ -89,14 +89,14 @@
             <button
                     type="button"
                     class="btn btn-light btn-lg btn-block"
-                    style="border: 1px solid black"
+                    style="border: 1px solid black; cursor: default"
             >
                 오늘의 격론💢
             </button>
             <button
                     type="button"
                     class="btn btn-primary btn-lg btn-block"
-                    style="margin-top: 0px; border: 1px solid black"
+                    style="margin-top: 0px; border: 1px solid black; cursor: default"
             >
                 이번 주의 격론💥
             </button>
@@ -237,7 +237,7 @@
                                         align-items-center
                                       "
                                     >` +
-                                `${item["title"]}` +
+                                ` <p id="allListText">${item["title"]}</p>` +
                                 `<span class="badge badge-primary badge-pill">${item["like"]}</span>
                                 </li>
                             </a>`;
@@ -252,7 +252,7 @@
                 // 오늘의 격론
                 let result = postList[0].postDate.split(' ', 1)[0].split('-')
                 const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
-                todayPosts.sort((a, b) => b.like - a.like )
+                todayPosts.sort((a, b) => b.like - a.like)
                 console.log(todayPosts)
                 console.log(result)
 
@@ -269,7 +269,7 @@
                                         align-items-center
                                       "
                                     >` +
-                        `${todayPosts[i]["title"]}` +
+                        `<p id="todayText">${todayPosts[i]["title"]}<p>` +
                         `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
                                 </li>
                             </a>`;
