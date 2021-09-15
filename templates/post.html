@@ -67,7 +67,6 @@
 
         }
 
-
         // 댓글 작성버튼에 대한 이벤트
         // 추가 작업 시간보내주기
         function PostReplyButton() {
@@ -84,7 +83,9 @@
                     data: {post_id: button_value, comment: reply, create_date: Today},
                     success: function (response) {
                         console.log(response['msg'])
+                        $('#ReplyComment').val('');
                         $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+
 
                     }
                 });
@@ -107,31 +108,36 @@
             var minute = ("0" + date.getMinutes()).slice(-2);
             var second = ("0" + date.getSeconds()).slice(-2);
 
-            return year + "-" + month + "-" +day + " " + hour + ":" + minute + ":" + second;
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
         }
 
         // 게시글 삭제 이벤트
         function DeletePost() {
-            let PostID = $('#DeletePost').val();
+            if (confirm("글을 삭제하시겠습니까?") == true) {
+                let PostID = $('#DeletePost').val();
+                console.log(PostID);
 
-            console.log(PostID);
-
-            $.ajax({
-                type: 'DELETE',
-                url: '/post',
-                data: {post_id: PostID},
-                success: function (response) {
-                    console.log(response['msg']);
-                    alert('게시글이 삭제되었습니다.')
-                    window.location.href = '/';
-                },
-                error : function(request){
-                    if ( request.status == 403 ) {
-                        alert("권한이 없습니다.");
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/post',
+                    data: {post_id: PostID},
+                    success: function (response) {
+                        console.log(response['msg']);
+                        alert('게시글이 삭제되었습니다.')
+                        window.location.href = '/';
+                    },
+                    error: function (request) {
+                        if (request.status == 403) {
+                            alert("권한이 없습니다.");
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                return;
+            }
         }
+
+
     </script>
 
 </head>
@@ -139,10 +145,26 @@
 <div>
     <section class="hero is-small is-primary">
         <div class="hero-body">
-            <button class="button is-link" onclick=window.location.href='/'>뒤로 돌아가기</button>
-            <p style="text-align: center;">
-                <span class="top_banner_title">재판 글</span>
-            </p>
+            <div>
+                <button class="button is-link" onclick=window.location.href='/'>재판실로 돌아가기</button>
+            </div>
+            <div>
+                <div style="float: left; text-align: right;width: 30%;">
+                    <button class="button is-warning">
+                        <span><strong>재판 수정</strong></span>
+                    </button>
+                </div>
+                <div style="float: left; text-align: center; width: 40%;">
+                    <p style="text-align: center;">
+                        <span class="top_banner_title" style="font-size: 70px;">재판 글</span>
+                    </p>
+                </div>
+                <div style="float: left; text-align: left; width: 30%;">
+                    <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
+                        <span style="color: black;"><strong>재판 삭제</strong></span>
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -151,7 +173,7 @@
             <!-- 글 정보 -->
             <div class="article_info" id="ArticleInfo">
                 <div class="article_author">
-                    <span>작성자: {{ post.id }}</span>
+                    <span>글쓴이: <strong>{{ post.id }}</strong></span>
                 </div>
                 <div class="article_data">
                     {% set date =  (post.postDate | string).split(' ') %}
@@ -159,7 +181,7 @@
                     <span>{{ date[0] }}  {{ today[0] }}:{{ today[1] }}</span>
                 </div>
                 <div class="article_hit">
-                    <span>조회: 0 &nbsp;&nbsp;&nbsp; 추천: <strong>{{ like_count }}</strong></span>
+                    <span>조회: <strong>{{ post.view }}</strong> &nbsp;&nbsp;&nbsp; 추천: <strong>{{ like_count }}</strong></span>
                 </div>
             </div>
 
@@ -207,7 +229,13 @@
                 <div>
                     <ul class="reply-ul" id="ReplyList">
                         {% for comment in post.comments %}
-                            <li class="reply-data">{{ comment.id }} <span>&nbsp;&nbsp;{{ post.postDate }}</span>
+                            <li class="reply-data">
+                                <span style="font-size: 17px;">
+                                {{ comment.id }}
+                                </span>
+                                <span style="color: gainsboro; font-size: 12px;">
+                                    &nbsp;({{ comment.create_date }})
+                                </span>
                                 <br>
                                 <div>
                                     {{ comment.comment }}
@@ -245,6 +273,5 @@
         </div>
     </div>
 </div>
-<button onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">삭제 버튼</button>
 </body>
 </html>
