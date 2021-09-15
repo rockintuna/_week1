@@ -203,8 +203,18 @@
     });
 
     // 조회수 늘리기
-    function onClickPost() {
-        console.log('hi')
+    function onClickPost(id) {
+        $.ajax({
+            type: 'POST',
+            url: '/view',
+            data:
+                {
+                    post_id: id
+                },
+            success: function (response) {
+                {#alert(response)#}
+            }
+        })
     }
 
     // 날짜 데이터 변환
@@ -237,11 +247,12 @@
                     pageSize: "7",
                     dataSource: postList.reverse(),
                     callback: function (data, pagination) {
-                        let dataHtml = "<div onclick='onClickPost()'>";
+                        let dataHtml = ``;
 
                         $.each(data, function (index, item) {
                             dataHtml +=
-                                `<a href="/post?post_id=${item['_id']}">
+                                `<div id="clickPost">
+                                    <a href="/post?post_id=${item['_id']}">
                                     <li
                                       class="
                                         list-group-item
@@ -253,12 +264,18 @@
                                 ` <p id="allListText">${item["title"]}</p>` +
                                 `<span class="badge badge-primary badge-pill">${item["like"]}</span>
                                 </li>
-                            </a>`;
+                            </a>
+                        </div>`;
+                            if (!dataHtml) {
+                                return;
+                            }
+                            $("#pagination").html(dataHtml);
+                            $("#clickPost").click(() => {
+                                onClickPost((item['_id']))
+                            })
                         });
 
-                        dataHtml += "</div>";
 
-                        $("#pagination").html(dataHtml);
                     },
                 });
 
@@ -266,13 +283,13 @@
                 const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
                 todayPosts.sort((a, b) => b.like - a.like)
                 console.log(todayPosts)
+                let todayData = ``;
 
-
-                let todayData = "<div onclick='onClickPost()'>";
-
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < todayPosts.length; i++) {
+                    if (i > 2) return;
                     todayData +=
-                        `<a href="/post?post_id=${todayPosts[i]['_id']}">
+                        `<div id="clickPost">
+                            <a href="/post?post_id=${todayPosts[i]['_id']}">
                                     <li
                                       class="
                                         list-group-item
@@ -284,11 +301,13 @@
                         `<p id="todayText">${todayPosts[i]["title"]}<p>` +
                         `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
                                 </li>
-                            </a>`;
+                            </a>
+                        </div>`;
+                    $("#clickPost").click(() => {
+                        onClickPost((todayPosts[i]['_id']))
+                    })
+                    $("#todayJudge").append(todayData)
                 }
-
-                todayData += "</div>";
-                $("#todayJudge").append(todayData)
 
                 // 이번 주 날짜 구하기
                 let weekStartDay = 0;
@@ -335,7 +354,8 @@
 
                 let weeklyData = "<div onclick='onClickPost()'>";
 
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < weeklyPosts.length; i++) {
+                    if (i > 2) return;
                     weeklyData +=
                         `<a href="/post?post_id=${weeklyPosts[i]['_id']}">
                                     <li
@@ -351,7 +371,6 @@
                                 </li>
                             </a>`;
                 }
-
                 weeklyData += "</div>";
                 $("#weeklyJudge").append(weeklyData)
             }
