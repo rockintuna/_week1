@@ -102,10 +102,10 @@
             </button>
         </div>
         <div class="lists">
-            <ul class="list-group">
+            <ul class="list-group" id="todayJudge">
 
             </ul>
-            <ul class="list-group">
+            <ul class="list-group" id="weeklyJudge">
 
             </ul>
         </div>
@@ -126,6 +126,16 @@
 <script>
     let postList = null;
     const userId = '{{ id }}';
+    const date = new Date().getDate().toString();
+    const month = () => {
+        let getMonth = (new Date().getMonth() + 1).toString();
+        if (getMonth < 10) {
+            getMonth = 0 + getMonth;
+        }
+        return getMonth;
+    }
+    const year = new Date().getFullYear().toString()
+    console.log(date, month(), year)
 
     //로그인 했을 경우
     if (userId) {
@@ -195,6 +205,7 @@
         console.log('hi')
     }
 
+
     // 글 목록 받아오기
     function getPosts() {
 
@@ -213,7 +224,7 @@
                     pageSize: "7",
                     dataSource: postList.reverse(),
                     callback: function (data, pagination) {
-                        var dataHtml = "<div onclick='onClickPost()'>";
+                        let dataHtml = "<div onclick='onClickPost()'>";
 
                         $.each(data, function (index, item) {
                             dataHtml +=
@@ -237,6 +248,60 @@
                         $("#pagination").html(dataHtml);
                     },
                 });
+
+                // 오늘의 격론
+                let result = postList[0].postDate.split(' ', 1)[0].split('-')
+                const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
+                todayPosts.sort((a, b) => b.like - a.like )
+                console.log(todayPosts)
+                console.log(result)
+
+                let todayData = "<div onclick='onClickPost()'>";
+
+                for (let i = 0; i < todayPosts.length; i++) {
+                    todayData +=
+                        `<a href="/post?post_id=${todayPosts[i]['_id']}">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        `${todayPosts[i]["title"]}` +
+                        `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
+                                </li>
+                            </a>`;
+                }
+
+
+                todayData += "</div>";
+                $("#todayJudge").append(todayData)
+
+                // 이번 주 구하기
+                function formatDate(date) {
+                    var mymonth = date.getMonth() + 1;
+                    var myweekday = date.getDate();
+                    return (mymonth + "/" + myweekday);
+                }
+
+                function printWeek() {
+                    var now = new Date();
+                    var nowDayOfWeek = now.getDay();
+                    var nowDay = now.getDate();
+                    var nowMonth = now.getMonth();
+                    var nowYear = now.getYear();
+                    nowYear += (nowYear < 2000) ? 1900 : 0;
+                    var weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
+                    var weekEndDate = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
+                    console.log("이번주는 :  " + formatDate(weekStartDate) + " - " + formatDate(weekEndDate));
+                }
+
+                printWeek()
+
+
+                // 이번 주의 격론
             }
         })
     }
