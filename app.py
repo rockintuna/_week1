@@ -130,15 +130,12 @@ def add_post():
         msg='로그인 정보가 존재하지 않습니다.'
         return render_template('error.html', msg=msg)
 
-# @app.route('/comment', methods=['POST'])
-# def plus_view():
-#     post_id_receive = request.form['post_id']
-#
-#     post_id_valid_check(post_id_receive)
-#     db.post.update_one({'_id': ObjectId(post_id_receive)},
-#                         {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
-#
-#     return jsonify({'msg': '조회수 추가.'})
+@app.route('/view', methods=['POST'])
+def view_post():
+    post_id_receive = request.form["post_id"]
+    post_id_valid_check(post_id_receive)
+    db.post.update_one({'_id': ObjectId(post_id_receive)}, {'$inc': {'view': 1}})
+    return jsonify({'msg': '조회수 추가.'})
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
