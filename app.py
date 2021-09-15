@@ -25,8 +25,8 @@ def main():
     if token_receive is not None:
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user = db.users.find_one({"id": payload["id"]}, {'_id': False})
-            return render_template('index.html', posts=posts, id=user["id"])
+            user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
+            return render_template('index.html', posts=posts, id=user["user_id"])
         except jwt.ExpiredSignatureError:
             msg = '로그인 시간이 만료되었습니다.'
             return render_template('error.html', msg=msg)
@@ -45,12 +45,12 @@ def login_main():
 
 @app.route('/register', methods=['POST'])
 def register_user():
-    id_receive = request.form['id']
+    id_receive = request.form['user_id']
     pw_receive = request.form['pw']
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
 
     doc = {
-        "id": id_receive,
+        "user_id": id_receive,
         "pw": pw_hash,
     }
 
@@ -61,21 +61,21 @@ def register_user():
 @app.route('/register/check_dup', methods=['POST'])
 def check_dup():
     username_receive = request.form['username_give']
-    exists = bool(db.users.find_one({"id": username_receive}))
+    exists = bool(db.users.find_one({"user_id": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    id_receive = request.form['id']
+    id_receive = request.form['user_id']
     pw_receive = request.form['pw']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'id': id_receive, 'pw': pw_hash})
+    result = db.users.find_one({'user_id': id_receive, 'pw': pw_hash})
 
     if result is not None:
         payload = {
-            'id': id_receive,
+            'user_id': id_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)
         }
 
@@ -111,14 +111,14 @@ def add_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]}, {'_id': False})
+        user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
 
         title_receive = request.form['title']
         content_receive = request.form['content']
         image_receive = request.form['image']
 
         doc = {
-            'id': user["id"],
+            'user_id': user["user_id"],
             'title': title_receive,
             'content': content_receive,
             'image': image_receive,
@@ -148,7 +148,7 @@ def update_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]})
+        user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form['post_id']
         title_receive = request.form['title']
@@ -174,7 +174,7 @@ def delete_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]})
+        user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form['post_id']
 
@@ -196,7 +196,7 @@ def add_comment():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]})
+        user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form['post_id']
         comment_receive = request.form['comment']
@@ -204,7 +204,7 @@ def add_comment():
 
         post_id_valid_check(post_id_receive)
         db.post.update_one({'_id': ObjectId(post_id_receive)},
-                           {'$push': {'comments': {'comment': comment_receive, 'id': user['id'],
+                           {'$push': {'comments': {'comment': comment_receive, 'user_id': user['user_id'],
                                                    'create_date': create_date_receive}}})
 
         return jsonify({'msg': '댓글이 작성되었습니다.'})
@@ -222,7 +222,7 @@ def delete_comment():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]})
+        user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form['post_id']
         comment_receive = request.form['comment_id']
@@ -247,33 +247,33 @@ def like_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user = db.users.find_one({"id": payload["id"]})
+        user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form["post_id"]
         action_receive = request.form["action"]
 
         post_id_valid_check(post_id_receive)
-        like = db.likes.find_one({"post_id": post_id_receive, "id": user["id"]})
+        like = db.likes.find_one({"post_id": post_id_receive, "user_id": user["user_id"]})
         if action_receive == "like":
             if like is None:
                 doc = {
                     "post_id": post_id_receive,
-                    "id": user["id"],
+                    "user_id": user["user_id"],
                     "like": 1
                 }
                 db.likes.insert_one(doc)
             else:
-                db.likes.update_one({"post_id": post_id_receive, "id": user["id"]}, {"$set": {"like": 1}})
+                db.likes.update_one({"post_id": post_id_receive, "user_id": user["user_id"]}, {"$set": {"like": 1}})
         else:
             if like is None:
                 doc = {
                     "post_id": post_id_receive,
-                    "id": user["id"],
+                    "user_id": user["user_id"],
                     "like": -1
                 }
                 db.likes.insert_one(doc)
             else:
-                db.likes.update_one({"post_id": post_id_receive, "id": user["id"]}, {"$set": {"like": -1}})
+                db.likes.update_one({"post_id": post_id_receive, "user_id": user["user_id"]}, {"$set": {"like": -1}})
 
         like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
         unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
@@ -293,7 +293,7 @@ def post_id_valid_check(post_id):
 
 def owner_check(post_id, user):
     post = db.post.find_one({'_id': ObjectId(post_id)})
-    if post["id"] != user["id"]:
+    if post["user_id"] != user["user_id"]:
         abort(403)
     return
 
