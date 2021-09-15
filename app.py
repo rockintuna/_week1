@@ -197,7 +197,7 @@ def like_post():
                 }
                 db.likes.insert_one(doc)
             else:
-                db.likes.update_one({"post_id": post_id_receive}, {"id": user["id"]}, {"$set": {"like": -1}})
+                db.likes.update_one({"post_id": post_id_receive, "id": user["id"]}, {"$set": {"like": -1}})
 
         like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
         unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
