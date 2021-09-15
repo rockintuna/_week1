@@ -26,9 +26,11 @@ def main():
             user = db.users.find_one({"id": payload["id"]}, {'_id': False})
             return render_template('index.html', posts=posts, id=user["id"])
         except jwt.ExpiredSignatureError:
-            return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+            msg='로그인 시간이 만료되었습니다.'
+            return render_template('error.html', msg=msg)
         except jwt.DecodeError:
-            return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+            msg='로그인 정보가 존재하지 않습니다.'
+            return render_template('error.html', msg=msg)
     else:
         return render_template('index.html', posts=posts)
 
@@ -82,6 +84,8 @@ def get_post_list():
     posts = list(db.post.find({}))
     for post in posts:
         post["_id"] = str(post["_id"])
+        post["like"] = db.likes.count({"post_id": post["_id"], "like": 1})
+        post["unlike"] = db.likes.count({"post_id": post["_id"], "like": -1})
     return jsonify({'posts': posts})
 
 @app.route('/post', methods=['GET'])
@@ -120,13 +124,14 @@ def add_post():
         db.post.insert_one(doc)
         return jsonify({'msg': '고민이 성공적으로 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
-        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+        msg='로그인 시간이 만료되었습니다.'
+        return render_template('error.html', msg=msg)
     except jwt.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+        msg='로그인 정보가 존재하지 않습니다.'
+        return render_template('error.html', msg=msg)
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
-
     token_receive = request.cookies.get('mytoken')
 
     try:
@@ -140,18 +145,31 @@ def add_comment():
                            {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
-        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+        msg = '로그인 시간이 만료되었습니다.'
+        return render_template('error.html', msg=msg)
     except jwt.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+        msg = '로그인 정보가 존재하지 않습니다.'
+        return render_template('error.html', msg=msg)
 
 @app.route('/post', methods=['DELETE'])
 def delete_post():
-    # todo auth try-catch
-    post_id_receive = request.form['post_id']
+    token_receive = request.cookies.get('mytoken')
 
-    post_id_valid_check(post_id_receive)
-    db.post.delete_one({'_id': post_id_receive})
-    return jsonify({'msg': '고민이 삭제되었습니다.'})
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user = db.users.find_one({"id": payload["id"]})
+        post_id_receive = request.form['post_id']
+        post_id_valid_check(post_id_receive)
+        is_owner(post_id_receive, user)
+        db.post.delete_one({'_id': ObjectId(post_id_receive)})
+        return jsonify({'msg': '고민이 삭제되었습니다.'})
+    except jwt.ExpiredSignatureError:
+        msg = '로그인 시간이 만료되었습니다.'
+        return render_template('error.html', msg=msg)
+    except jwt.DecodeError:
+        msg = '로그인 정보가 존재하지 않습니다.'
+        return render_template('error.html', msg=msg)
+
 
 @app.route('/post', methods=['PUT'])
 def update_post():
@@ -205,9 +223,11 @@ def like_post():
         unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
         return jsonify({"result": "success", 'msg': 'updated', "like_count": like_count, "unlike_count": unlike_count})
     except jwt.ExpiredSignatureError:
-        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+        msg = '로그인 시간이 만료되었습니다.'
+        return render_template('error.html', msg=msg)
     except jwt.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+        msg = '로그인 정보가 존재하지 않습니다.'
+        return render_template('error.html', msg=msg)
 
 
 @app.route('/unlike', methods=['POST'])
@@ -221,6 +241,18 @@ def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:
         abort(404)
     return
+
+def is_owner(post_id, user):
+    post = db.post.find_one({'_id': ObjectId(post_id)})
+    if post is None:
+        abort(404)
+    elif post['id'] != user:
+        abort(403)
+    return
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
 
 @app.errorhandler(404)
 def page_not_found(e):
