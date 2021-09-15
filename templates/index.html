@@ -42,10 +42,12 @@
 </head>
 
 <body>
-<div class="sign">
-    <button onclick="window.location.replace('/login_main')">로그인</button>
-</div>
+
 <div class="container">
+    <div class="sign">
+        <button onclick="window.location.replace('/login_main')" type="button" class="btn btn-secondary btn-lg loginBtn">로그인</button>
+        <div class="username">어서오세요, {{ id }} 존경장님</div>
+    </div>
     <div class="title">재판하는 존경장님</div>
     <div class="buttons">
         <button
@@ -62,7 +64,7 @@
                 id="doJudge"
                 style="margin-top: 0px"
         >
-            재판하기👨⚖️
+            재판하기⚖️
         </button>
     </div>
     <!-- 재판하기 리스트 출력 -->
@@ -178,15 +180,28 @@
 
 <script>
     let postList = null;
+    const userId = '{{ id }}';
 
-    //재판받기
+    //로그인 했을 경우
+    if (userId) {
+        $('.loginBtn').hide()
+        $('.username').show()
+    }
+
+
+    //재판하기
     $("#doJudge").click(function () {
+
         $(".list-all").show();
         $(".post-container").hide();
     });
 
     // 재판접수
     function post() {
+        if (!userId) {
+            alert("로그인이 필요합니다!")
+            return;
+        }
         let title = $(".input-title").val()
         let comment = $(".input-content").val()
 
@@ -204,8 +219,14 @@
         })
     }
 
-    // 재판하기
+    // 재판받기
     $("#getJudge").click(function () {
+        console.log(userId);
+        if (!userId) {
+            alert("재판을 받기전에 로그인을 해주세요!")
+            console.log('실행')
+            return;
+        }
         $(".list-all").hide();
         $(".post-container").show();
     });
