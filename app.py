@@ -48,6 +48,7 @@ def register_user():
     id_receive = request.form['user_id']
     pw_receive = request.form['pw']
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
+    # todo user_id_exist_check()
 
     doc = {
         "user_id": id_receive,
@@ -101,9 +102,14 @@ def get_post():
     post_id_valid_check(post_id_receive)
     post = db.post.find_one({'_id': ObjectId(post_id_receive)})
     post["_id"] = str(post["_id"])
+
+    comments = db.comment.find({'post_id': post_id_receive})
+    for comment in comments:
+        comment["_id"] = str(comment["_id"])
+
     like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
     unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
-    return render_template('post.html', post=post, like_count=like_count, unlike_count=unlike_count)
+    return render_template('post.html', post=post, comments=comments, like_count=like_count, unlike_count=unlike_count)
 
 @app.route('/post', methods=['POST'])
 def add_post():
@@ -201,12 +207,16 @@ def add_comment():
         post_id_receive = request.form['post_id']
         comment_receive = request.form['comment']
         create_date_receive = request.form['create_date']
-
         post_id_valid_check(post_id_receive)
-        db.post.update_one({'_id': ObjectId(post_id_receive)},
-                           {'$push': {'comments': {'comment': comment_receive, 'user_id': user['user_id'],
-                                                   'create_date': create_date_receive}}})
 
+        doc = {
+            'user_id': user["user_id"],
+            'post_id': post_id_receive,
+            'comment': comment_receive,
+            'create_date': create_date_receive
+        }
+
+        db.comment.insert_one(doc)
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
@@ -228,12 +238,9 @@ def delete_comment():
         comment_id_receive = request.form['comment_id']
 
         post_id_valid_check(post_id_receive)
-        comment_owner_check(post_id_receive, comment_id_receive, user)
-        db.post.update({'_id': ObjectId(post_id_receive)},
-                       {'$unset': {"comments."+comment_id_receive: 1}})
-        db.post.update({'_id': ObjectId(post_id_receive)},
-                       {'$pull': {"comments": None}})
+        comment_owner_check(comment_id_receive, user)
 
+        db.comment.delete_one({'_id': ObjectId(comment_id_receive)})
         return jsonify({'msg': '댓글이 제거되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
@@ -298,10 +305,9 @@ def post_owner_check(post_id, user):
         abort(403)
     return
 
-def comment_owner_check(post_id, comment_id, user):
-    post = db.post.find_one({'_id': ObjectId(post_id)})
-    comment = post["comments"][comment_id]
-    if post["user_id"] != user["user_id"] and comment["user_id"] != user["user_id"]:
+def comment_owner_check(comment_id, user):
+    comment = db.comment.find_one({'_id': ObjectId(comment_id)})
+    if comment["user_id"] != user["user_id"]:
         abort(403)
     return
 
