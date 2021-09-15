@@ -68,7 +68,6 @@
         }
 
         // 댓글 작성버튼에 대한 이벤트
-        // 추가 작업 시간보내주기
         function PostReplyButton() {
             let reply = $('#ReplyComment').val();
             let button_value = $('#ReplyButton').val();
@@ -86,7 +85,6 @@
                         $('#ReplyComment').val('');
                         $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
 
-
                     }
                 });
             } else {
@@ -94,49 +92,57 @@
             }
         }
 
-        // yyyy-mm-dd 형식 만들기
-        function TodayDate() {
-            var date = new Date();
-
-            // 년,월,일
-            var year = date.getFullYear();
-            var month = ("0" + (1 + date.getMonth())).slice(-2);
-            var day = ("0" + date.getDate()).slice(-2);
-
-            // 시간, 분, 초
-            var hour = ("0" + date.getHours()).slice(-2);
-            var minute = ("0" + date.getMinutes()).slice(-2);
-            var second = ("0" + date.getSeconds()).slice(-2);
-
-            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-        }
-
-        // 게시글 삭제 이벤트
-        function DeletePost() {
-            if (confirm("글을 삭제하시겠습니까?") == true) {
-                let PostID = $('#DeletePost').val();
-                console.log(PostID);
-
-                $.ajax({
-                    type: 'DELETE',
-                    url: '/post',
-                    data: {post_id: PostID},
-                    success: function (response) {
-                        console.log(response['msg']);
-                        alert('게시글이 삭제되었습니다.')
-                        window.location.href = '/';
-                    },
-                    error: function (request) {
-                        if (request.status == 403) {
-                            alert("권한이 없습니다.");
-                        }
-                    }
-                });
+        // 댓글 삭제 작업중
+        function DeleteReply() {
+            if (confirm("댓글을 삭제하시겠습니까?") == true) {
+                console.log($('#Comment_number').val());
             } else {
                 return;
             }
         }
 
+            // yyyy-mm-dd 형식 만들기
+            function TodayDate() {
+                var date = new Date();
+
+                // 년,월,일
+                var year = date.getFullYear();
+                var month = ("0" + (1 + date.getMonth())).slice(-2);
+                var day = ("0" + date.getDate()).slice(-2);
+
+                // 시간, 분, 초
+                var hour = ("0" + date.getHours()).slice(-2);
+                var minute = ("0" + date.getMinutes()).slice(-2);
+                var second = ("0" + date.getSeconds()).slice(-2);
+
+                return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+            }
+
+            // 게시글 삭제 이벤트
+            function DeletePost() {
+                if (confirm("글을 삭제하시겠습니까?") == true) {
+                    let PostID = $('#DeletePost').val();
+                    console.log(PostID);
+
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/post',
+                        data: {post_id: PostID},
+                        success: function (response) {
+                            console.log(response['msg']);
+                            alert('게시글이 삭제되었습니다.')
+                            window.location.href = '/';
+                        },
+                        error: function (request) {
+                            if (request.status == 403) {
+                                alert("권한이 없습니다.");
+                            }
+                        }
+                    });
+                } else {
+                    return;
+                }
+            }
 
     </script>
 
@@ -217,8 +223,6 @@
                             비공감 : {{ unlike_count }}
                         </div>
                     </div>
-
-
                 </div>
             </div>
 
@@ -228,15 +232,26 @@
                 <hr>
                 <div>
                     <ul class="reply-ul" id="ReplyList">
-                        {% for comment in post.comments %}
+                        {% for comment in post.comments%}
                             <li class="reply-data">
+                                <div style="height: 35px;">
+                                    <div style="float: left; width: 50%;">
                                 <span style="font-size: 17px;">
                                 {{ comment.id }}
                                 </span>
-                                <span style="color: gainsboro; font-size: 12px;">
+                                        <span style="color: gainsboro; font-size: 12px;">
                                     &nbsp;({{ comment.create_date }})
                                 </span>
-                                <br>
+                                    </div>
+                                    <div style="float: right;">
+                                        <button class="button is-light" onclick="DeleteReply()"
+                                                id="Comment_number" value="{{ loop.index0 }}">
+                                            <span style="font-size:10px;">
+                                                <strong>삭제</strong>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div>
                                     {{ comment.comment }}
                                 </div>
