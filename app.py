@@ -156,7 +156,7 @@ def update_post():
         image_receive = request.form['image']
 
         post_id_valid_check(post_id_receive)
-        owner_check(post_id_receive, user)
+        post_owner_check(post_id_receive, user)
         db.post.update_one({'_id': ObjectId(post_id_receive)},
                            {'$set': {'title': title_receive, 'content': content_receive, 'image': image_receive}})
 
@@ -179,7 +179,7 @@ def delete_post():
         post_id_receive = request.form['post_id']
 
         post_id_valid_check(post_id_receive)
-        owner_check(post_id_receive, user)
+        post_owner_check(post_id_receive, user)
         db.post.delete_one({'_id': ObjectId(post_id_receive)})
 
         return jsonify({'msg': '고민이 삭제되었습니다.'})
@@ -225,11 +225,12 @@ def delete_comment():
         user = db.users.find_one({"user_id": payload["user_id"]})
 
         post_id_receive = request.form['post_id']
-        comment_receive = request.form['comment_id']
+        comment_id_receive = request.form['comment_id']
 
         post_id_valid_check(post_id_receive)
+        comment_owner_check(post_id_receive, comment_id_receive, user)
         db.post.update({'_id': ObjectId(post_id_receive)},
-                       {'$unset': {"comments."+comment_receive: 1}})
+                       {'$unset': {"comments."+comment_id_receive: 1}})
         db.post.update({'_id': ObjectId(post_id_receive)},
                        {'$pull': {"comments": None}})
 
@@ -291,9 +292,16 @@ def post_id_valid_check(post_id):
         abort(404)
     return
 
-def owner_check(post_id, user):
+def post_owner_check(post_id, user):
     post = db.post.find_one({'_id': ObjectId(post_id)})
     if post["user_id"] != user["user_id"]:
+        abort(403)
+    return
+
+def comment_owner_check(post_id, comment_id, user):
+    post = db.post.find_one({'_id': ObjectId(post_id)})
+    comment = post["comments"][comment_id]
+    if post["user_id"] != user["user_id"] and comment["user_id"] != user["user_id"]:
         abort(403)
     return
 
