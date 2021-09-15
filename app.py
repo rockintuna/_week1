@@ -1,4 +1,3 @@
-import bson.errors
 from bson import ObjectId
 from flask import Flask, render_template, jsonify, request, abort
 from pymongo import MongoClient
@@ -6,6 +5,8 @@ from datetime import datetime, timedelta
 import jwt
 import hashlib
 
+## AWS DB 접속
+#client = MongoClient('mongodb://test:test@localhost', 27017)
 client = MongoClient('localhost', 27017)
 db = client.honorablejudge
 app = Flask(__name__)
@@ -115,7 +116,8 @@ def add_post():
             'title': title_receive,
             'content': content_receive,
             'image': image_receive,
-            'postDate': datetime.now()
+            'postDate': datetime.now(),
+            'view': 0
         }
         db.post.insert_one(doc)
 
@@ -127,6 +129,16 @@ def add_post():
         msg='로그인 정보가 존재하지 않습니다.'
         return render_template('error.html', msg=msg)
 
+# @app.route('/comment', methods=['POST'])
+# def plus_view():
+#     post_id_receive = request.form['post_id']
+#
+#     post_id_valid_check(post_id_receive)
+#     db.post.update_one({'_id': ObjectId(post_id_receive)},
+#                         {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
+#
+#     return jsonify({'msg': '조회수 추가.'})
+
 @app.route('/comment', methods=['POST'])
 def add_comment():
     token_receive = request.cookies.get('mytoken')
@@ -137,10 +149,12 @@ def add_comment():
 
         post_id_receive = request.form['post_id']
         comment_receive = request.form['comment']
+        create_date_receive = request.form['create_date']
 
         post_id_valid_check(post_id_receive)
         db.post.update_one({'_id': ObjectId(post_id_receive)},
-                           {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
+                           {'$push': {'comments': {'comment': comment_receive, 'id': user['id'],
+                                                   'create_date': create_date_receive}}})
 
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
@@ -243,13 +257,6 @@ def like_post():
         msg = '로그인 정보가 존재하지 않습니다.'
         return render_template('error.html', msg=msg)
 
-# @app.route('/unlike', methods=['POST'])
-# def unlike_post():
-#     post_id_receive = request.form['post_id']
-#     post_id_valid_check(post_id_receive)
-#     db.post.update_one({'_id': post_id_receive}, {'$inc': {'unlike':1}})
-#     return jsonify({'msg': '비추천.'})
-
 def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:
         abort(404)
@@ -260,10 +267,6 @@ def owner_check(post_id, user):
     if post["id"] != user["id"]:
         abort(403)
     return
-
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template('403.html'), 403
 
 @app.errorhandler(404)
 def page_not_found(e):
