@@ -103,74 +103,10 @@
         </div>
         <div class="lists">
             <ul class="list-group">
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?
-                    <span class="badge badge-primary badge-pill">14</span>
-                </li>
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    아몰라 응애
-                    <span class="badge badge-primary badge-pill">2</span>
-                </li>
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    국밥을 시켰는데 밥이 말아져 나왔습니다.
-                    <span class="badge badge-primary badge-pill">1</span>
-                </li>
+
             </ul>
             <ul class="list-group">
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    동생이 탕수육을 자꾸 부어먹습니다. 때려도 무죄인가요?
-                    <span class="badge badge-primary badge-pill">14</span>
-                </li>
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    주간 2위
-                    <span class="badge badge-primary badge-pill">5</span>
-                </li>
-                <li
-                        class="
-                list-group-item
-                d-flex
-                justify-content-between
-                align-items-center
-              "
-                >
-                    주간 3위
-                    <span class="badge badge-primary badge-pill">3</span>
-                </li>
+
             </ul>
         </div>
     </div>
@@ -219,6 +155,15 @@
         let title = $(".input-title").val()
         let comment = $(".input-content").val()
 
+        if (!title.trim()) {
+            alert('제목을 입력해주세요!')
+            return;
+        }
+        if (!comment.trim()) {
+            alert('내용을 입력해주세요!')
+            return;
+        }
+
         $.ajax({
             type: "POST",
             url: "/post",
@@ -245,6 +190,11 @@
         $(".post-container").show();
     });
 
+    // 조회수 늘리기
+    function onClickPost() {
+        console.log('hi')
+    }
+
     // 글 목록 받아오기
     function getPosts() {
 
@@ -256,12 +206,14 @@
             success: function (response) {
                 postList = response['posts'];
                 console.log(postList)
+                console.log(postList[0].postDate)
+                console.log(typeof (postList[0].postDate))
                 // 페이지네이션
                 $("#demo").pagination({
                     pageSize: "7",
                     dataSource: postList.reverse(),
                     callback: function (data, pagination) {
-                        var dataHtml = "<div>";
+                        var dataHtml = "<div onclick='onClickPost()'>";
 
                         $.each(data, function (index, item) {
                             dataHtml +=
