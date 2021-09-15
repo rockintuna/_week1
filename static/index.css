@@ -113,7 +113,7 @@
     cursor: pointer;
 }
 
-.loginBtn{
+.loginBtn {
     float: right;
 }
 
@@ -122,8 +122,28 @@
     font-family: "Hahmlet", serif;
 }
 
-.logoutBtn{
+.logoutBtn {
     margin: 0 20px;
     display: none;
     cursor: pointer;
+}
+
+.list-group-item {
+    margin: 0;
+}
+
+#todayText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#allListText{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+p{
+    margin-bottom: 0;
 }
