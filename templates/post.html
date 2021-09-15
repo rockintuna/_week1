@@ -113,26 +113,31 @@
 
         // 게시글 삭제 이벤트
         function DeletePost() {
-            let PostID = $('#DeletePost').val();
+            if (confirm("글을 삭제하시겠습니까?") == true) {
+                let PostID = $('#DeletePost').val();
+                console.log(PostID);
 
-            console.log(PostID);
-
-            $.ajax({
-                type: 'DELETE',
-                url: '/post',
-                data: {post_id: PostID},
-                success: function (response) {
-                    console.log(response['msg']);
-                    alert('게시글이 삭제되었습니다.')
-                    window.location.href = '/';
-                },
-                error: function (request) {
-                    if (request.status == 403) {
-                        alert("권한이 없습니다.");
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/post',
+                    data: {post_id: PostID},
+                    success: function (response) {
+                        console.log(response['msg']);
+                        alert('게시글이 삭제되었습니다.')
+                        window.location.href = '/';
+                    },
+                    error: function (request) {
+                        if (request.status == 403) {
+                            alert("권한이 없습니다.");
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                return;
+            }
         }
+
+
     </script>
 
 </head>
@@ -168,7 +173,7 @@
             <!-- 글 정보 -->
             <div class="article_info" id="ArticleInfo">
                 <div class="article_author">
-                    <span>작성자: {{ post.id }}</span>
+                    <span>글쓴이: <strong>{{ post.id }}</strong></span>
                 </div>
                 <div class="article_data">
                     {% set date =  (post.postDate | string).split(' ') %}
@@ -224,7 +229,13 @@
                 <div>
                     <ul class="reply-ul" id="ReplyList">
                         {% for comment in post.comments %}
-                            <li class="reply-data">{{ comment.id }} <span>&nbsp;&nbsp;{{ post.postDate }}</span>
+                            <li class="reply-data">
+                                <span style="font-size: 17px;">
+                                {{ comment.id }}
+                                </span>
+                                <span style="color: gainsboro; font-size: 12px;">
+                                    &nbsp;({{ comment.create_date }})
+                                </span>
                                 <br>
                                 <div>
                                     {{ comment.comment }}
@@ -262,6 +273,5 @@
         </div>
     </div>
 </div>
-<button onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">삭제 버튼</button>
 </body>
 </html>
