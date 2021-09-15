@@ -85,6 +85,7 @@ def get_post_list():
     posts = list(db.post.find({}))
     for post in posts:
         post["_id"] = str(post["_id"])
+        post["postDate"] = str(post["postDate"])
         post["like"] = db.likes.count({"post_id": post["_id"], "like": 1})
         post["unlike"] = db.likes.count({"post_id": post["_id"], "like": -1})
     return jsonify({'posts': posts})
