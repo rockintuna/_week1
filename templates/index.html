@@ -54,7 +54,7 @@
                 class="btn btn-secondary loginBtn">로그인
         </button>
         <div class="username">어서오세요, {{ id }} 존경장님
-            <button class="logoutBtn btn-sm btn-outline-secondary" type="button" onclick="logout()">Logout</button>
+            <button class="logoutBtn btn-sm btn-outline-secondary" type="button" onclick="logout()">로그아웃</button>
         </div>
     </div>
     <div class="title">재판하는 존경장님</div>
@@ -89,23 +89,23 @@
             <button
                     type="button"
                     class="btn btn-light btn-lg btn-block"
-                    style="border: 1px solid black"
+                    style="border: 1px solid black; cursor: default"
             >
-                오늘의 격론💢
+                오늘의 TOP3💢
             </button>
             <button
                     type="button"
                     class="btn btn-primary btn-lg btn-block"
-                    style="margin-top: 0px; border: 1px solid black"
+                    style="margin-top: 0px; border: 1px solid black; cursor: default"
             >
-                이번 주의 격론💥
+                이번 주 TOP3💥
             </button>
         </div>
         <div class="lists">
-            <ul class="list-group">
+            <ul class="list-group" id="todayJudge">
 
             </ul>
-            <ul class="list-group">
+            <ul class="list-group" id="weeklyJudge">
 
             </ul>
         </div>
@@ -126,6 +126,18 @@
 <script>
     let postList = null;
     const userId = '{{ id }}';
+    const date = new Date().getDate().toString();
+    const month = () => {
+        let getMonth = (new Date().getMonth() + 1).toString();
+        if (getMonth < 10) {
+            getMonth = 0 + getMonth;
+        }
+        return getMonth;
+    }
+    const year = new Date().getFullYear().toString()
+    console.log(date, month(), year)
+    let weekStartDate;
+    let weekEndDate;
 
     //로그인 했을 경우
     if (userId) {
@@ -195,6 +207,18 @@
         console.log('hi')
     }
 
+    // 날짜 데이터 변환
+    function formatMonth(date) {
+        const mymonth = date.getMonth() + 1;
+        return mymonth;
+    }
+
+    function formatDate(date) {
+        const myweekday = date.getDate();
+        return myweekday;
+    }
+
+
     // 글 목록 받아오기
     function getPosts() {
 
@@ -213,7 +237,7 @@
                     pageSize: "7",
                     dataSource: postList.reverse(),
                     callback: function (data, pagination) {
-                        var dataHtml = "<div onclick='onClickPost()'>";
+                        let dataHtml = "<div onclick='onClickPost()'>";
 
                         $.each(data, function (index, item) {
                             dataHtml +=
@@ -226,7 +250,7 @@
                                         align-items-center
                                       "
                                     >` +
-                                `${item["title"]}` +
+                                ` <p id="allListText">${item["title"]}</p>` +
                                 `<span class="badge badge-primary badge-pill">${item["like"]}</span>
                                 </li>
                             </a>`;
@@ -237,7 +261,101 @@
                         $("#pagination").html(dataHtml);
                     },
                 });
+
+                // 오늘의 격론
+                const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
+                todayPosts.sort((a, b) => b.like - a.like)
+                console.log(todayPosts)
+
+
+                let todayData = "<div onclick='onClickPost()'>";
+
+                for (let i = 0; i < 3; i++) {
+                    todayData +=
+                        `<a href="/post?post_id=${todayPosts[i]['_id']}">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        `<p id="todayText">${todayPosts[i]["title"]}<p>` +
+                        `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
+                                </li>
+                            </a>`;
+                }
+
+                todayData += "</div>";
+                $("#todayJudge").append(todayData)
+
+                // 이번 주 날짜 구하기
+                let weekStartDay = 0;
+                let weekLastDay = 0;
+
+                function printWeek() {
+                    const now = new Date();
+                    const nowDayOfWeek = now.getDay();
+                    const nowDay = 1;
+                    const nowMonth = now.getMonth();
+                    let nowYear = now.getYear();
+                    nowYear += (nowYear < 2000) ? 1900 : 0;
+                    weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
+                    weekEndDate = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
+                    console.log("이번주는 :  " + formatDate(weekStartDate) + " - " + formatDate(weekEndDate));
+                    weekStartDay = formatDate(weekStartDate)
+                    weekLastDay = formatDate(weekEndDate)
+
+                    console.log(weekStartDay, weekLastDay)
+                }
+
+                printWeek()
+
+                // 이번 주의 격론
+                const weeklyPosts = postList.filter(v => {
+                    console.log(Number(v.postDate.split(' ', 1)[0].split('-')[2]))
+                    if (weekStartDay > weekLastDay) {
+                        if (v.postDate.split(' ', 1)[0].split('-')[2] > toString(weekStartDay)) {
+                            return true;
+                        }
+                        if (v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    if (toString(weekStartDay) < v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
+                        return true;
+                    }
+                    return false;
+                });
+                weeklyPosts.sort((a, b) => b.like - a.like)
+                console.log('d', weeklyPosts)
+
+
+                let weeklyData = "<div onclick='onClickPost()'>";
+
+                for (let i = 0; i < 3; i++) {
+                    weeklyData +=
+                        `<a href="/post?post_id=${weeklyPosts[i]['_id']}">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        `<p id="todayText">${weeklyPosts[i]["title"]}<p>` +
+                        `<span class="badge badge-primary badge-pill">${weeklyPosts[i]["like"]}</span>
+                                </li>
+                            </a>`;
+                }
+
+                weeklyData += "</div>";
+                $("#weeklyJudge").append(weeklyData)
             }
+
         })
     }
 
