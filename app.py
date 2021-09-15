@@ -45,18 +45,20 @@ def login_main():
 
 @app.route('/register', methods=['POST'])
 def register_user():
-    id_receive = request.form['user_id']
+    user_id_receive = request.form['user_id']
     pw_receive = request.form['pw']
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-    # todo user_id_exist_check()
+    if is_user_id_exist(user_id_receive):
+        abort(400, {'msg': '이미 존재하는 ID 입니다.'})
+        return
+    else:
+        doc = {
+            "user_id": user_id_receive,
+            "pw": pw_hash,
+        }
 
-    doc = {
-        "user_id": id_receive,
-        "pw": pw_hash,
-    }
-
-    db.users.insert_one(doc)
-    return jsonify({'result': 'success'})
+        db.users.insert_one(doc)
+        return jsonify({'result': 'success'})
 
 
 @app.route('/register/check_dup', methods=['POST'])
@@ -68,15 +70,15 @@ def check_dup():
 
 @app.route('/login', methods=['POST'])
 def login():
-    id_receive = request.form['user_id']
+    user_id_receive = request.form['user_id']
     pw_receive = request.form['pw']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'user_id': id_receive, 'pw': pw_hash})
+    result = db.users.find_one({'user_id': user_id_receive, 'pw': pw_hash})
 
     if result is not None:
         payload = {
-            'user_id': id_receive,
+            'user_id': user_id_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)
         }
 
@@ -293,6 +295,9 @@ def like_post():
     except jwt.DecodeError:
         msg = '로그인 정보가 존재하지 않습니다.'
         return render_template('error.html', msg=msg)
+
+def is_user_id_exist(user_id):
+    return db.users.find_one({'user_id': user_id}) is not None
 
 def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:
