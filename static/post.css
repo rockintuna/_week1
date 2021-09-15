@@ -1,0 +1,90 @@
+
+.top_banner_title {
+    font-family: 'Black Han Sans', sans-serif;
+    color: black;
+    font-size: 50px;
+}
+
+/*포스터 외곽*/
+/*.whole_post_page {*/
+/*    width: 1000px;*/
+/*    margin: 50px auto;*/
+
+/*    padding: 30px;*/
+/*    border: solid;*/
+
+/*}*/
+
+.article {
+    width: 800px;
+    margin: 30px auto;
+
+    /*테투리로 div 보이게하기*/
+    /*border: solid;*/
+    /*border-radius: 10px;*/
+
+}
+
+.article_info {
+    background: beige;
+
+    height: 30px;
+    text-align: center;
+
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+}
+
+.article_author {
+    float: left;
+    width: 30%;
+}
+
+.article_data {
+    margin-left: 30px;
+    float: left;
+    width: 30%;
+}
+
+.article_hit {
+    float: right;
+    width: 30%;
+}
+
+.article-title {
+    text-align: center;
+    width: 100%;
+    height: 50px;
+    border: 10px;
+}
+
+.article-content {
+    width: 800px;
+    height: 500px;
+}
+
+.reply-data {
+    font-family: 'Jua', sans-serif;
+}
+
+.LikeorUnlike {
+    height: 100px;
+
+}
+
+.LikeButton {
+    width: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.UnlikeButton {
+    width: 88px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.reply-list {
+    margin-top: 50px;
+}
