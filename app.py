@@ -91,7 +91,9 @@ def get_post():
         post_id_valid_check(post_id_receive)
         post = db.post.find_one({'_id': ObjectId(post_id_receive)})
         post["_id"] = str(post["_id"])
-        return render_template('post.html', post=post)
+        like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
+        unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
+        return render_template('post.html', post=post, like_count=like_count, unlike_count=unlike_count)
     except bson.errors.InvalidId:
         abort(404)
 
