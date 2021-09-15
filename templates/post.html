@@ -16,128 +16,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <!-- Ajax CDN -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    <style>
-        .top_banner_title {
-            font-family: 'Black Han Sans', sans-serif;
-            color: black;
-            font-size: 50px;
-        }
-
-        /*포스터 외곽*/
-        /*.whole_post_page {*/
-        /*    width: 1000px;*/
-        /*    margin: 50px auto;*/
-
-        /*    padding: 30px;*/
-        /*    border: solid;*/
-
-        /*}*/
-
-        .article {
-            width: 800px;
-            margin: 30px auto;
-
-            /*테투리로 div 보이게하기*/
-            /*border: solid;*/
-            /*border-radius: 10px;*/
-
-        }
-
-        .article_info {
-            background: beige;
-
-            height: 30px;
-            text-align: center;
-
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-
-        }
-
-        .article_author {
-            float: left;
-            width: 30%;
-        }
-
-        .article_data {
-            margin-left: 30px;
-            float: left;
-            width: 30%;
-        }
-
-        .article_hit {
-            float: right;
-            width: 30%;
-        }
-
-        .article-title {
-            text-align: center;
-            width: 100%;
-            height: 50px;
-            border: 10px;
-        }
-
-        .article-content {
-            width: 800px;
-            height: 500px;
-        }
-
-        .reply-data {
-            font-family: 'Jua', sans-serif;
-        }
-
-        .LikeorUnlike {
-            height: 100px;
-
-        }
-
-        .LikeButton {
-            width: 80px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .UnlikeButton {
-            width: 88px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .reply-list {
-            margin-top: 50px;
-        }
-    </style>
+    <!-- static CSS file load -->
+    <link rel="stylesheet" type="text/css" href="/static/post.css">
 
     <script>
-        // 댓글 작성버튼에 대한 이벤트
-        // server 에 댓글을 POST
-        // 현재의 HTML append 작업
-        function PostReplyButton() {
-            let reply = $('#ReplyComment').val();
-            let button_value = $('#ReplyButton').val();
-
-            console.log(reply, button_value);
-
-            if (reply != '') {
-                $.ajax({
-                    type: "POST",
-                    url: '/comment',
-                    data: {post_id: button_value, comment: reply},
-                    success: function (response) {
-                        console.log(response['msg'])
-                        //window.location.reload();
-                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
-                    }
-                });
-            }
-            else {
-                alert('댓글을 입력하세요.');
-            }
-            // 반영된 페이지 refresh
-        }
-
 
         // 공감 버튼 눌렀을 때의 이벤트
         function PushLikeButton() {
@@ -180,17 +66,61 @@
             });
 
         }
-        //
+
+
+        // 댓글 작성버튼에 대한 이벤트
+        // 추가 작업 시간보내주기
+        function PostReplyButton() {
+            let reply = $('#ReplyComment').val();
+            let button_value = $('#ReplyButton').val();
+            let Today = TodayDate();
+
+            console.log(reply, button_value, Today);
+
+            if (reply != '') {
+                $.ajax({
+                    type: "POST",
+                    url: '/comment',
+                    data: {post_id: button_value, comment: reply, create_date: Today},
+                    success: function (response) {
+                        console.log(response['msg'])
+                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+
+                    }
+                });
+            } else {
+                alert('댓글을 입력하세요.');
+            }
+        }
+
+        // yyyy-mm-dd 형식 만들기
+        function TodayDate() {
+            var date = new Date();
+
+            // 년,월,일
+            var year = date.getFullYear();
+            var month = ("0" + (1 + date.getMonth())).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
+
+            // 시간, 분, 초
+            var hour = ("0" + date.getHours()).slice(-2);
+            var minute = ("0" + date.getMinutes()).slice(-2);
+            var second = ("0" + date.getSeconds()).slice(-2);
+
+            return year + "-" + month + "-" +day + " " + hour + ":" + minute + ":" + second;
+        }
+
         // 게시글 삭제 이벤트
         function DeletePost() {
             let PostID = $('#DeletePost').val();
-            //window.location.href = '/';
+
             console.log(PostID);
-            $.ajax ({
+
+            $.ajax({
                 type: 'DELETE',
                 url: '/post',
                 data: {post_id: PostID},
-                success : function (response) {
+                success: function (response) {
                     console.log(response['msg']);
                     alert('게시글이 삭제되었습니다.')
                     window.location.href = '/';
@@ -209,8 +139,9 @@
 <div>
     <section class="hero is-small is-primary">
         <div class="hero-body">
+            <button class="button is-link" onclick=window.location.href='/'>뒤로 돌아가기</button>
             <p style="text-align: center;">
-                <span class="top_banner_title">고민 글</span>
+                <span class="top_banner_title">재판 글</span>
             </p>
         </div>
     </section>
@@ -276,13 +207,13 @@
                 <div>
                     <ul class="reply-ul" id="ReplyList">
                         {% for comment in post.comments %}
-                        <li class="reply-data">{{ comment.id }} <span>&nbsp;&nbsp;{{ post.postDate }}</span>
-                            <br>
-                            <div>
-                                {{ comment.comment }}
-                            </div>
-                            <hr>
-                        </li>
+                            <li class="reply-data">{{ comment.id }} <span>&nbsp;&nbsp;{{ post.postDate }}</span>
+                                <br>
+                                <div>
+                                    {{ comment.comment }}
+                                </div>
+                                <hr>
+                            </li>
                         {% endfor %}
 
                     </ul>
@@ -302,7 +233,8 @@
                     <nav class="level">
                         <div class="level-left">
                             <div class="level-item">
-                                <button class="button is-info" onclick="PostReplyButton()" value="{{ post._id }}" id="ReplyButton">
+                                <button class="button is-info" onclick="PostReplyButton()" value="{{ post._id }}"
+                                        id="ReplyButton">
                                     댓글 작성
                                 </button>
                             </div>
