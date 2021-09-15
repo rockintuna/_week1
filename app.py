@@ -90,7 +90,6 @@ def get_post_list():
 
 @app.route('/post', methods=['GET'])
 def get_post():
-    try:
         post_id_receive = request.args.get("post_id")
         post_id_valid_check(post_id_receive)
         post = db.post.find_one({'_id': ObjectId(post_id_receive)})
@@ -98,8 +97,6 @@ def get_post():
         like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
         unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
         return render_template('post.html', post=post, like_count=like_count, unlike_count=unlike_count)
-    except bson.errors.InvalidId:
-        abort(404)
 
 @app.route('/post', methods=['POST'])
 def add_post():
@@ -107,11 +104,11 @@ def add_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user = db.users.find_one({"id": payload["id"]}, {'_id':False})
 
         title_receive = request.form['title']
         content_receive = request.form['content']
         image_receive = request.form['image']
-        user = db.users.find_one({"id": payload["id"]}, {'_id':False})
 
         doc = {
             'id': user["id"],
@@ -120,8 +117,8 @@ def add_post():
             'image': image_receive,
             'postDate': datetime.now()
         }
-
         db.post.insert_one(doc)
+
         return jsonify({'msg': '고민이 성공적으로 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg='로그인 시간이 만료되었습니다.'
@@ -136,13 +133,15 @@ def add_comment():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user = db.users.find_one({"id": payload["id"]})
+
         post_id_receive = request.form['post_id']
         comment_receive = request.form['comment']
+
         post_id_valid_check(post_id_receive)
         db.post.update_one({'_id': ObjectId(post_id_receive)},
                            {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
+
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
@@ -158,10 +157,13 @@ def delete_post():
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user = db.users.find_one({"id": payload["id"]})
+
         post_id_receive = request.form['post_id']
+
         post_id_valid_check(post_id_receive)
-        is_owner(post_id_receive, user)
+        owner_check(post_id_receive, user)
         db.post.delete_one({'_id': ObjectId(post_id_receive)})
+
         return jsonify({'msg': '고민이 삭제되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
@@ -173,16 +175,28 @@ def delete_post():
 
 @app.route('/post', methods=['PUT'])
 def update_post():
-    # todo auth try-catch
-    post_id_receive = request.form['post_id']
-    title_receive = request.form['title']
-    content_receive = request.form['content']
-    image_receive = request.form['image']
+    token_receive = request.cookies.get('mytoken')
 
-    post_id_valid_check(post_id_receive)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user = db.users.find_one({"id": payload["id"]})
 
-    db.post.update_one({'_id': post_id_receive},{'$set': {'title': title_receive,'content': content_receive,'image': image_receive}})
-    return jsonify({'msg': '고민이 수정되었습니다.'})
+        post_id_receive = request.form['post_id']
+        title_receive = request.form['title']
+        content_receive = request.form['content']
+        image_receive = request.form['image']
+
+        post_id_valid_check(post_id_receive)
+        owner_check(post_id_receive, user)
+        db.post.update_one({'_id': ObjectId(post_id_receive)},{'$set': {'title': title_receive,'content': content_receive,'image': image_receive}})
+
+        return jsonify({'msg': '고민이 수정되었습니다.'})
+    except jwt.ExpiredSignatureError:
+        msg = '로그인 시간이 만료되었습니다.'
+        return render_template('error.html', msg=msg)
+    except jwt.DecodeError:
+        msg = '로그인 정보가 존재하지 않습니다.'
+        return render_template('error.html', msg=msg)
 
 @app.route('/like', methods=['POST'])
 def like_post():
@@ -190,14 +204,13 @@ def like_post():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user = db.users.find_one({"id": payload["id"]})
-        action_receive = request.form["action"]
+
         post_id_receive = request.form["post_id"]
+        action_receive = request.form["action"]
+
         post_id_valid_check(post_id_receive)
-
         like = db.likes.find_one({"post_id": post_id_receive, "id": user["id"]})
-
         if action_receive == "like":
             if like is None :
                 doc = {
@@ -221,6 +234,7 @@ def like_post():
 
         like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
         unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
+
         return jsonify({"result": "success", 'msg': 'updated', "like_count": like_count, "unlike_count": unlike_count})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
@@ -229,24 +243,21 @@ def like_post():
         msg = '로그인 정보가 존재하지 않습니다.'
         return render_template('error.html', msg=msg)
 
-
-@app.route('/unlike', methods=['POST'])
-def unlike_post():
-    post_id_receive = request.form['post_id']
-    post_id_valid_check(post_id_receive)
-    db.post.update_one({'_id': post_id_receive}, {'$inc': {'unlike':1}})
-    return jsonify({'msg': '비추천.'})
+# @app.route('/unlike', methods=['POST'])
+# def unlike_post():
+#     post_id_receive = request.form['post_id']
+#     post_id_valid_check(post_id_receive)
+#     db.post.update_one({'_id': post_id_receive}, {'$inc': {'unlike':1}})
+#     return jsonify({'msg': '비추천.'})
 
 def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:
         abort(404)
     return
 
-def is_owner(post_id, user):
+def owner_check(post_id, user):
     post = db.post.find_one({'_id': ObjectId(post_id)})
-    if post is None:
-        abort(404)
-    elif post['id'] != user:
+    if post["id"] != user["id"]:
         abort(403)
     return
 
