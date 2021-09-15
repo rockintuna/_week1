@@ -18,7 +18,12 @@
     <link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet">
 
     <!-- JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+            src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
     <script
             src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
@@ -45,8 +50,12 @@
 
 <div class="container">
     <div class="sign">
-        <button onclick="window.location.replace('/login_main')" type="button" class="btn btn-secondary btn-lg loginBtn">로그인</button>
-        <div class="username">어서오세요, {{ id }} 존경장님</div>
+        <button onclick="window.location.replace('/login_main')" type="button"
+                class="btn btn-secondary loginBtn">로그인
+        </button>
+        <div class="username">어서오세요, {{ id }} 존경장님
+            <button class="logoutBtn btn-sm btn-outline-secondary" type="button" onclick="logout()">Logout</button>
+        </div>
     </div>
     <div class="title">재판하는 존경장님</div>
     <div class="buttons">
@@ -186,12 +195,17 @@
     if (userId) {
         $('.loginBtn').hide()
         $('.username').show()
+        $('.logoutBtn').show()
     }
 
+    // 로그아웃
+    function logout() {
+        $.removeCookie('mytoken', {path: '/'});
+        window.location.href = "/"
+    }
 
     //재판하기
     $("#doJudge").click(function () {
-
         $(".list-all").show();
         $(".post-container").hide();
     });

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,60 +112,81 @@
     </style>
 
     <script>
-        let PostID = '{{ post }}';
-
         // 댓글 작성버튼에 대한 이벤트
         // server 에 댓글을 POST
         // 현재의 HTML append 작업
-        function PostReply() {
-            let writing_id = 1;
+        function PostReplyButton() {
 
             let comment = $('#ReplyComment').val();
+            let button_value = $('#ReplyButton').val();
+            console.log(comment, button_value);
             $.ajax({
                 type: "POST",
                 url: '/comment',
-                data: {post_id: writing_id, com: comment},
+                data: {post_id: button_value, comment: comment},
                 success: function (response) {
                     console.log(response['msg'])
 
                     // 보내주고 refresh 를 통해서 다시 리스트 목록을 불러와야할듯하다.
                 }
             });
-           // window.location.reload();
+            // window.location.reload();
         }
+
+
         // 공감 버튼 눌렀을 때의 이벤트
         function PushLikeButton() {
             let button_value = $('#LikeButton').val().split(' ');
             let button_action = button_value[0];
-            let button_id = button_value[1];
+            let button_id = button_value[1]
 
-           $.ajax({
-                type: 'POST',
-                url: '/like',
-                data: {post_id: button_id, action: button_action},
-                success : function (response) {
-                    console.log(response['msg'])
-                }
-            });
-           //window.location.reload();
-        }
-
-        function PushUnLikeButton() {
-            let button_value = $('#LikeButton').val().split(' ');
-            let button_action = button_value[0];
-            let button_id = button_value[1];
-
+            console.log(button_action, button_id)
             $.ajax({
                 type: 'POST',
                 url: '/like',
                 data: {post_id: button_id, action: button_action},
-                success : function (response) {
+                success: function (response) {
+                    console.log(response['msg'])
+                }
+            });
+            //window.location.reload();
+        }
+
+
+        // 비공감 버튼 이벤트
+        function PushUnLikeButton() {
+            let button_value = $('#UnLikeButton').val().split(' ');
+            let button_action = button_value[0];
+            let button_id = button_value[1];
+
+            console.log(button_action, button_id)
+            $.ajax({
+                type: 'POST',
+                url: '/like',
+                data: {post_id: button_id, action: button_action},
+                success: function (response) {
                     console.log(response['msg'])
                 }
             });
             // window.location.reload();
         }
 
+
+        // 게시글 삭제 이벤트
+        function DeletePost() {
+            let PostID = $('#DeletePost').val();
+
+            $.ajax ({
+                type: 'DELETE',
+                url: '/post',
+                data: {post_id: PostID},
+                success : function (response) {
+                    console.log(response['msg']);
+                    alert('게시글이 삭제되었습니다.')
+                    window.location.href = '/';
+                }
+            });
+        }
     </script>
 
 </head>
@@ -183,26 +205,25 @@
             <!-- 글 정보 -->
             <div class="article_info">
                 <div class="article_author">
-                    <span>작성자: {{ post.id }}</span>
+                    <span>작성자: jeangho111</span>
                 </div>
                 <div class="article_data">
-                    <span>{{ post.postDate }}</span>
+                    <span>2021-09-15 10:28:22.155000</span>
                 </div>
                 <div class="article_hit">
                     <span>조회: 1 &nbsp;&nbsp;&nbsp; 추천: 100</span>
                 </div>
             </div>
 
-
             <!-- 글 제목 -->
             <div class="article-title">
-                <span style="font-size:20px;">{{ post.title }}</span>
+                <span style="font-size:20px;">ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</span>
             </div>
             <hr>
 
             <!-- 글 상세내용 입니다 -->
             <div class="article-content">
-                {{ post.content }}
+                ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ
 
             </div>
             <hr>
@@ -210,11 +231,11 @@
             <!-- 공감 비공감 입니다 -->
             <div class="LikeorUnlike">
                 <div style="text-align: center;">
-                    <button onclick="PushLikeButton()" value="like {{ post._id }}" id="LikeButton">
+                    <button onclick="PushLikeButton()" value="like 61414c36f5e58c249a4b7975" id="LikeButton">
                         <img src="/static/good_thumb.png" class="LikeButton">
                     </button>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button onclick="PushUnLikeButton()" id="UnLikeButton" value="unlike {{ post._id }}">
+                    <button onclick="PushUnLikeButton()" id="UnLikeButton" value="unlike 61414c36f5e58c249a4b7975">
                         <img src="/static/bad_thumb.png" class="UnlikeButton">
                     </button>
 
@@ -294,14 +315,17 @@
                 <div class="media-content">
                     <div class="field">
                         <p class="control">
-                                <textarea rows="3" class="textarea" placeholder="댓글을 달아주세요!"
-                                          id="ReplyComment"></textarea>
+
+                            <textarea rows="3" class="textarea" placeholder="댓글을 달아주세요!"
+                                      id="ReplyComment"></textarea>
                         </p>
                     </div>
                     <nav class="level">
                         <div class="level-left">
                             <div class="level-item">
-                                <a class="button is-info" onclick="PostReply()">댓글 작성</a>
+                                <button class="button is-info" onclick="PostReplyButton()" value="61414c36f5e58c249a4b7975" id="ReplyButton">
+                                    댓글 작성
+                                </button>
                             </div>
                         </div>
                     </nav>
@@ -310,6 +334,6 @@
         </div>
     </div>
 </div>
-
+<button onclick="DeletePost()" value="61414c36f5e58c249a4b7975" id="DeletePost">삭제 버튼</button>
 </body>
 </html>

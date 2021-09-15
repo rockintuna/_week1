@@ -103,18 +103,27 @@
 }
 
 .sign {
-
     text-align: center;
-    width: 200px;
+    width: 300px;
     margin: 0 auto 50px;
     float: right;
 }
 
-.postListOne{
+.postListOne {
     cursor: pointer;
 }
 
-.username{
+.loginBtn{
+    float: right;
+}
+
+.username {
     display: none;
     font-family: "Hahmlet", serif;
+}
+
+.logoutBtn{
+    margin: 0 20px;
+    display: none;
+    cursor: pointer;
 }
