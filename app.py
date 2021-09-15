@@ -134,9 +134,9 @@ def add_comment():
 
         user = db.users.find_one({"id": payload["id"]})
         post_id_receive = request.form['post_id']
-        comment_receive = request.form['com']
+        comment_receive = request.form['comment']
         post_id_valid_check(post_id_receive)
-        db.post.update_one({'_id': post_id_receive},
+        db.post.update_one({'_id': ObjectId(post_id_receive)},
                            {'$push': {'comments': {'comment': comment_receive, 'id': user["id"]}}})
         return jsonify({'msg': '댓글이 작성되었습니다.'})
     except jwt.ExpiredSignatureError:
