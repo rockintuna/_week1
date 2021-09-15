@@ -5,8 +5,9 @@ from datetime import datetime, timedelta
 import jwt
 import hashlib
 
+
 ## AWS DB 접속
-# client = MongoClient('mongodb://test:test@localhost', 27017)
+#client = MongoClient('mongodb://test:test@localhost', 27017)
 client = MongoClient('localhost', 27017)
 db = client.honorablejudge
 app = Flask(__name__)

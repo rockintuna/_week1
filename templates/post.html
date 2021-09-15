@@ -146,24 +146,46 @@
 
     </script>
 
+    <style>
+        .revise_post {
+            float: left;
+            text-align: right;
+            width: 30%;
+        }
+
+        .post_title_div {
+            float: left;
+            text-align: center;
+            width: 40%
+        }
+
+        .post_title {
+            font-size: 70px;
+        }
+    </style>
 </head>
 <body>
 <div>
     <section class="hero is-small is-primary">
         <div class="hero-body">
+
+            <!-- 재판실로 돌아가는 버튼 -->
             <div>
                 <button class="button is-link" onclick=window.location.href='/'>재판실로 돌아가기</button>
             </div>
+
+            <!-- 재판 수정, 재판 글 배너, 재판 삭제 -->
             <div>
-                <div style="float: left; text-align: right;width: 30%;">
+                <!-- 재판 수정 버튼 -->
+                <div class="revise_post">
                     <button class="button is-warning">
                         <span><strong>재판 수정</strong></span>
                     </button>
                 </div>
-                <div style="float: left; text-align: center; width: 40%;">
-                    <p style="text-align: center;">
-                        <span class="top_banner_title" style="font-size: 70px;">재판 글</span>
-                    </p>
+
+                <!-- 재판 글 배너 -->
+                <div class="post_title_div">
+                    <span class="top_banner_title post_title">재판 글</span>
                 </div>
                 <div style="float: left; text-align: left; width: 30%;">
                     <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
@@ -233,6 +255,7 @@
                 <div>
                     <ul class="reply-ul" id="ReplyList">
                         {% for comment in post.comments%}
+                            {% set index = loop.index0 %}
                             <li class="reply-data">
                                 <div style="height: 35px;">
                                     <div style="float: left; width: 50%;">
@@ -245,9 +268,9 @@
                                     </div>
                                     <div style="float: right;">
                                         <button class="button is-light" onclick="DeleteReply()"
-                                                id="Comment_number" value="{{ loop.index0 }}">
+                                                id="Comment_number" value="{{ index }}">
                                             <span style="font-size:10px;">
-                                                <strong>삭제</strong>
+                                                <strong>삭제 {{ index }}</strong>
                                             </span>
                                         </button>
                                     </div>
