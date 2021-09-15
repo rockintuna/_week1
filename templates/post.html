@@ -118,18 +118,22 @@
             let reply = $('#ReplyComment').val();
             let button_value = $('#ReplyButton').val();
 
+
             console.log(reply, button_value);
-
-            $.ajax({
-                type: "POST",
-                url: '/comment',
-                data: {post_id: button_value, comment: reply},
-                success: function (response) {
-                    console.log(response['msg'])
-
-                    // 보내주고 refresh 를 통해서 다시 리스트 목록을 불러와야할듯하다.
-                }
-            });
+            if (reply != '') {
+                $.ajax({
+                    type: "POST",
+                    url: '/comment',
+                    data: {post_id: button_value, comment: reply},
+                    success: function (response) {
+                        console.log(response['msg'])
+                    }
+                });
+            }
+            else {
+                alert('댓글을 입력하세요.');
+            }
+            // 반영된 페이지 refresh
              window.location.reload();
         }
 
@@ -176,7 +180,8 @@
         // 게시글 삭제 이벤트
         function DeletePost() {
             let PostID = $('#DeletePost').val();
-
+            //window.location.href = '/';
+            console.log(PostID);
             $.ajax ({
                 type: 'DELETE',
                 url: '/post',
