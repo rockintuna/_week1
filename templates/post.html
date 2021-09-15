@@ -194,6 +194,11 @@
                     console.log(response['msg']);
                     alert('게시글이 삭제되었습니다.')
                     window.location.href = '/';
+                },
+                error : function(request){
+                    if ( request.status == 403 ) {
+                        alert("권한이 없습니다.");
+                    }
                 }
             });
         }
