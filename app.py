@@ -77,19 +77,6 @@ def login():
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
-@app.route('/user_info', methods=['GET'])
-def get_user_info():
-    token_receive = request.cookies.get('mytoken')
-
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        userinfo = db.user.find_one({'id': payload['id']})
-        return jsonify({'result': 'success', 'nickname': userinfo['nick']})
-    except jwt.ExpiredSignatureError:
-        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    except jwt.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
-
 @app.route('/posts', methods=['GET'])
 def get_post_list():
     posts = list(db.post.find({}))
@@ -102,7 +89,8 @@ def get_post():
     try:
         post_id_receive = request.args.get("post_id")
         post_id_valid_check(post_id_receive)
-        post = db.post.find_one({'_id': ObjectId(post_id_receive)}, {'_id': False})
+        post = db.post.find_one({'_id': ObjectId(post_id_receive)})
+        post["_id"] = str(post["_id"])
         return render_template('post.html', post=post)
     except bson.errors.InvalidId:
         abort(404)
@@ -156,6 +144,7 @@ def add_comment():
 
 @app.route('/post', methods=['DELETE'])
 def delete_post():
+    # todo auth try-catch
     post_id_receive = request.form['post_id']
 
     post_id_valid_check(post_id_receive)
@@ -164,6 +153,7 @@ def delete_post():
 
 @app.route('/post', methods=['PUT'])
 def update_post():
+    # todo auth try-catch
     post_id_receive = request.form['post_id']
     title_receive = request.form['title']
     content_receive = request.form['content']
