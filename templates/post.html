@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,21 +115,22 @@
         // server 에 댓글을 POST
         // 현재의 HTML append 작업
         function PostReplyButton() {
-
-            let comment = $('#ReplyComment').val();
+            let reply = $('#ReplyComment').val();
             let button_value = $('#ReplyButton').val();
-            console.log(comment, button_value);
+
+            console.log(reply, button_value);
+
             $.ajax({
                 type: "POST",
                 url: '/comment',
-                data: {post_id: button_value, comment: comment},
+                data: {post_id: button_value, comment: reply},
                 success: function (response) {
                     console.log(response['msg'])
 
                     // 보내주고 refresh 를 통해서 다시 리스트 목록을 불러와야할듯하다.
                 }
             });
-            // window.location.reload();
+             window.location.reload();
         }
 
 
@@ -141,6 +141,7 @@
             let button_id = button_value[1]
 
             console.log(button_action, button_id)
+
             $.ajax({
                 type: 'POST',
                 url: '/like',
@@ -149,7 +150,7 @@
                     console.log(response['msg'])
                 }
             });
-            //window.location.reload();
+            window.location.reload();
         }
 
 
@@ -168,7 +169,7 @@
                     console.log(response['msg'])
                 }
             });
-            // window.location.reload();
+             window.location.reload();
         }
 
 
@@ -205,7 +206,7 @@
             <!-- 글 정보 -->
             <div class="article_info">
                 <div class="article_author">
-                    <span>작성자: jeangho111</span>
+                    <span>작성자: {{ post.id }}</span>
                 </div>
                 <div class="article_data">
                     <span>2021-09-15 10:28:22.155000</span>
@@ -217,35 +218,34 @@
 
             <!-- 글 제목 -->
             <div class="article-title">
-                <span style="font-size:20px;">ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</span>
+                <span style="font-size:20px;">{{ post.title}}</span>
             </div>
             <hr>
 
             <!-- 글 상세내용 입니다 -->
             <div class="article-content">
-                ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ
-
+                {{ post.content }}
             </div>
             <hr>
 
             <!-- 공감 비공감 입니다 -->
             <div class="LikeorUnlike">
                 <div style="text-align: center;">
-                    <button onclick="PushLikeButton()" value="like 61414c36f5e58c249a4b7975" id="LikeButton">
+                    <button onclick="PushLikeButton()" value="like {{ post._id }}" id="LikeButton">
                         <img src="/static/good_thumb.png" class="LikeButton">
                     </button>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button onclick="PushUnLikeButton()" id="UnLikeButton" value="unlike 61414c36f5e58c249a4b7975">
+                    <button onclick="PushUnLikeButton()" id="UnLikeButton" value="unlike {{ post._id }}">
                         <img src="/static/bad_thumb.png" class="UnlikeButton">
                     </button>
 
                     <!-- 공감 비공감 텍스트입니다 -->
                     <div style="width: 250px; margin: 10px auto;">
                         <div style="float:left; width: 35%; text-align: center;">
-                            공감 : 0
+                            공감 : {{ like_count }}
                         </div>
                         <div style="float: right; width: 40%; text-align: center;">
-                            비공감 : 0
+                            비공감 : {{ unlike_count }}
                         </div>
                     </div>
 
@@ -259,53 +259,16 @@
                 <hr>
                 <div>
                     <ul class="reply-ul" id="ReplyList">
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
+                        {% for comment in post.comments %}
+                        <li class="reply-data">{{ comment.id }} <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
                             <br>
                             <div>
-                                fdas
+                                {{ comment.comment }}
                             </div>
                             <hr>
                         </li>
+                        {% endfor %}
 
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
-                            <br>
-                            <div>
-                                rewqrewqrewq
-                            </div>
-                            <hr>
-                        </li>
-
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
-                            <br>
-                            <div>
-                                fdasfeareasresareas
-                            </div>
-                            <hr>
-                        </li>
-
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
-                            <br>
-                            <div>
-                                fdsafear
-                            </div>
-                            <hr>
-                        </li>
-
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
-                            <br>
-                            <div>
-                                fdsafdsafdsafdsafasd
-                            </div>
-                            <hr>
-                        </li>
-
-                        <li class="reply-data">정호 <span>&nbsp;&nbsp;(2021-09-13 15:00:00)</span>
-                            <br>
-                            <div>
-                                fdsafeasfas
-                            </div>
-                            <hr>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -323,7 +286,7 @@
                     <nav class="level">
                         <div class="level-left">
                             <div class="level-item">
-                                <button class="button is-info" onclick="PostReplyButton()" value="61414c36f5e58c249a4b7975" id="ReplyButton">
+                                <button class="button is-info" onclick="PostReplyButton()" value="{{ post._id }}" id="ReplyButton">
                                     댓글 작성
                                 </button>
                             </div>
@@ -334,6 +297,6 @@
         </div>
     </div>
 </div>
-<button onclick="DeletePost()" value="61414c36f5e58c249a4b7975" id="DeletePost">삭제 버튼</button>
+<button onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">삭제 버튼</button>
 </body>
 </html>
