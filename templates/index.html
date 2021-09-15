@@ -135,7 +135,6 @@
         return getMonth;
     }
     const year = new Date().getFullYear().toString()
-    console.log(date, month(), year)
     let weekStartDate;
     let weekEndDate;
 
@@ -192,30 +191,14 @@
 
     // 재판받기
     $("#getJudge").click(function () {
-        console.log(userId);
         if (!userId) {
             alert("재판을 받기전에 로그인을 해주세요!")
-            console.log('실행')
             return;
         }
         $(".list-all").hide();
         $(".post-container").show();
     });
 
-    // 조회수 늘리기
-    function onClickPost(id) {
-        $.ajax({
-            type: 'POST',
-            url: '/view',
-            data:
-                {
-                    post_id: id
-                },
-            success: function (response) {
-                {#alert(response)#}
-            }
-        })
-    }
 
     // 날짜 데이터 변환
     function formatMonth(date) {
@@ -231,150 +214,228 @@
 
     // 글 목록 받아오기
     function getPosts() {
-
-        $("#post-box").empty()
+        {#$("#post-box").empty()#}
         $.ajax({
             type: "GET",
             url: `/posts`,
+            async: false,
             data: {},
             success: function (response) {
                 postList = response['posts'];
-                console.log(postList)
-                console.log(postList[0].postDate)
-                console.log(typeof (postList[0].postDate))
-                // 페이지네이션
-                $("#demo").pagination({
-                    pageSize: "7",
-                    dataSource: postList.reverse(),
-                    callback: function (data, pagination) {
-                        let dataHtml = ``;
-
-                        $.each(data, function (index, item) {
-                            dataHtml +=
-                                `<div id="clickPost">
-                                    <a href="/post?post_id=${item['_id']}">
-                                    <li
-                                      class="
-                                        list-group-item
-                                        d-flex
-                                        justify-content-between
-                                        align-items-center
-                                      "
-                                    >` +
-                                ` <p id="allListText">${item["title"]}</p>` +
-                                `<span class="badge badge-primary badge-pill">${item["like"]}</span>
-                                </li>
-                            </a>
-                        </div>`;
-                            if (!dataHtml) {
-                                return;
-                            }
-                            $("#pagination").html(dataHtml);
-                            $("#clickPost").click(() => {
-                                onClickPost((item['_id']))
-                            })
-                        });
-
-
-                    },
-                });
-
-                // 오늘의 격론
-                const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
-                todayPosts.sort((a, b) => b.like - a.like)
-                console.log(todayPosts)
-                let todayData = ``;
-
-                for (let i = 0; i < todayPosts.length; i++) {
-                    if (i > 2) return;
-                    todayData +=
-                        `<div id="clickPost">
-                            <a href="/post?post_id=${todayPosts[i]['_id']}">
-                                    <li
-                                      class="
-                                        list-group-item
-                                        d-flex
-                                        justify-content-between
-                                        align-items-center
-                                      "
-                                    >` +
-                        `<p id="todayText">${todayPosts[i]["title"]}<p>` +
-                        `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
-                                </li>
-                            </a>
-                        </div>`;
-                    $("#clickPost").click(() => {
-                        onClickPost((todayPosts[i]['_id']))
-                    })
-                    $("#todayJudge").append(todayData)
-                }
-
-                // 이번 주 날짜 구하기
-                let weekStartDay = 0;
-                let weekLastDay = 0;
-
-                function printWeek() {
-                    const now = new Date();
-                    const nowDayOfWeek = now.getDay();
-                    const nowDay = 1;
-                    const nowMonth = now.getMonth();
-                    let nowYear = now.getYear();
-                    nowYear += (nowYear < 2000) ? 1900 : 0;
-                    weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
-                    weekEndDate = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
-                    console.log("이번주는 :  " + formatDate(weekStartDate) + " - " + formatDate(weekEndDate));
-                    weekStartDay = formatDate(weekStartDate)
-                    weekLastDay = formatDate(weekEndDate)
-
-                    console.log(weekStartDay, weekLastDay)
-                }
-
-                printWeek()
-
-                // 이번 주의 격론
-                const weeklyPosts = postList.filter(v => {
-                    console.log(Number(v.postDate.split(' ', 1)[0].split('-')[2]))
-                    if (weekStartDay > weekLastDay) {
-                        if (v.postDate.split(' ', 1)[0].split('-')[2] > toString(weekStartDay)) {
-                            return true;
-                        }
-                        if (v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                    if (toString(weekStartDay) < v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
-                        return true;
-                    }
-                    return false;
-                });
-                weeklyPosts.sort((a, b) => b.like - a.like)
-                console.log('d', weeklyPosts)
-
-
-                let weeklyData = "<div onclick='onClickPost()'>";
-
-                for (let i = 0; i < weeklyPosts.length; i++) {
-                    if (i > 2) return;
-                    weeklyData +=
-                        `<a href="/post?post_id=${weeklyPosts[i]['_id']}">
-                                    <li
-                                      class="
-                                        list-group-item
-                                        d-flex
-                                        justify-content-between
-                                        align-items-center
-                                      "
-                                    >` +
-                        `<p id="todayText">${weeklyPosts[i]["title"]}<p>` +
-                        `<span class="badge badge-primary badge-pill">${weeklyPosts[i]["like"]}</span>
-                                </li>
-                            </a>`;
-                }
-                weeklyData += "</div>";
-                $("#weeklyJudge").append(weeklyData)
+                {#alert('읽기끝')#}
+                printPosts();
             }
+        })
 
+    }
+
+    function printPosts() {
+        $("#demo").pagination({
+            pageSize: "7",
+            dataSource: postList.reverse(),
+            callback: function (data, pagination) {
+                let dataHtml = ``;
+
+                /*$.each(data, function (index, item) {
+                    dataHtml +=
+                        `<div id="clickPost">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        ` <p id="allListText">${item["title"]}</p>` +
+                        `<span class="badge badge-primary badge-pill">${item["like"]}</span>
+                                </li>
+                        </div>`;
+                    if (!dataHtml) {
+                        return;
+                    }
+                    $("#clickPost").click(() => {
+                        onClickPost((item['_id']))
+                    })
+                    $("#pagination").html(dataHtml);
+                });*/
+
+                for (let i = 0; i < data.length; i++) {
+                    (function (data) {
+
+                        var dataHtml =
+                            $(`<div class="clickPost">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                                ` <p id="allListText">${data["title"]}</p>` +
+                                `<span class="badge badge-primary badge-pill">${data["like"]}</span>
+                                </li>
+                        </div>`);
+
+                        dataHtml.unbind("click")
+                        dataHtml.bind("click", function () {
+                            onClickPost(data['_id'])
+                        })
+
+                        $("#pagination").append(dataHtml);
+                        dataHtml = '';
+                    })(data[i])
+
+                }
+            },
+        });
+
+        // 오늘의 top3
+        const todayPosts = postList.filter(v => v.postDate.split(' ', 1)[0].split('-')[2] === date && v.postDate.split(' ', 1)[0].split('-')[1] === month() && v.postDate.split(' ', 1)[0].split('-')[0] === year);
+        todayPosts.sort((a, b) => b.like - a.like)
+        let todayData = '';
+
+
+        /*
+        for (let i = 0; i < todayPosts.length; i++) {
+
+        if (i > 2) return;
+        todayData +=
+            `<div id="clickTodayPost">
+                                <li
+                                  class="
+                                    list-group-item
+                                    d-flex
+                                    justify-content-between
+                                    align-items-center
+                                  "
+                                >` +
+            `<p id="todayText">${todayPosts[i]["title"]}<p>` +
+            `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
+                            </li>
+                    </div>`;
+        if (!todayData) {
+            return;
+        }
+        $("#clickTodayPost").click({id: todayPosts[i]['_id']}, onClickPost)
+        }
+         */
+        for (let i = 0; i < todayPosts.length; i++) {
+            if(i>2) break;
+            (function (data) {
+                var dataHtml = '';
+                dataHtml =
+                    $(`<div class="clickPost">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        ` <p id="allListText">${data["title"]}</p>` +
+                        `<span class="badge badge-primary badge-pill">${data["like"]}</span>
+                                </li>
+                        </div>`);
+
+                dataHtml.unbind("click")
+                dataHtml.bind("click", function () {
+                    onClickPost(data['_id'])
+                })
+
+                $("#todayJudge").append(dataHtml);
+                dataHtml = '';
+            })(todayPosts[i])
+        }
+
+
+        // 이번 주 날짜 구하기
+        let weekStartDay = 0;
+        let weekLastDay = 0;
+
+        function printWeek() {
+            const now = new Date();
+            const nowDayOfWeek = now.getDay();
+            const nowDay = 1;
+            const nowMonth = now.getMonth();
+            let nowYear = now.getYear();
+            nowYear += (nowYear < 2000) ? 1900 : 0;
+            weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
+            weekEndDate = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
+            weekStartDay = formatDate(weekStartDate)
+            weekLastDay = formatDate(weekEndDate)
+
+        }
+
+        printWeek()
+
+        // 이번 주의 top3
+        const weeklyPosts = postList.filter(v => {
+            if (weekStartDay > weekLastDay) {
+                if (v.postDate.split(' ', 1)[0].split('-')[2] > toString(weekStartDay)) {
+                    return true;
+                }
+                if (v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
+                    return true;
+                }
+                return false;
+            }
+            if (toString(weekStartDay) < v.postDate.split(' ', 1)[0].split('-')[2] < toString(weekLastDay)) {
+                return true;
+            }
+            return false;
+        });
+        weeklyPosts.sort((a, b) => b.like - a.like)
+        console.log(weeklyPosts)
+
+
+        for (let i = 0; i < weeklyPosts.length; i++) {
+            if(i>2) break;
+            (function (data) {
+                var dataHtml = '';
+                dataHtml =
+                    $(`<div class="clickPost">
+                                    <li
+                                      class="
+                                        list-group-item
+                                        d-flex
+                                        justify-content-between
+                                        align-items-center
+                                      "
+                                    >` +
+                        ` <p id="allListText">${data["title"]}</p>` +
+                        `<span class="badge badge-primary badge-pill">${data["like"]}</span>
+                                </li>
+                        </div>`);
+
+                dataHtml.unbind("click")
+                dataHtml.bind("click", function () {
+                    onClickPost(data['_id'])
+                })
+
+                $("#weeklyJudge").append(dataHtml);
+                dataHtml = '';
+            })(weeklyPosts[i])
+        }
+    }
+
+
+    // 조회수 늘리기
+    function onClickPost(id) {
+
+        $.ajax({
+            type: 'POST',
+            url: '/view',
+            async: false,
+            data:
+                {
+                    post_id: id
+                },
+            success: function (response) {
+                window.location.href = `/post?post_id=${id}`
+            }
         })
     }
 
