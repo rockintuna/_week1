@@ -118,8 +118,8 @@
             let reply = $('#ReplyComment').val();
             let button_value = $('#ReplyButton').val();
 
-
             console.log(reply, button_value);
+
             if (reply != '') {
                 $.ajax({
                     type: "POST",
@@ -127,6 +127,7 @@
                     data: {post_id: button_value, comment: reply},
                     success: function (response) {
                         console.log(response['msg'])
+                        window.location.reload();
                     }
                 });
             }
@@ -134,7 +135,6 @@
                 alert('댓글을 입력하세요.');
             }
             // 반영된 페이지 refresh
-             window.location.reload();
         }
 
 
@@ -152,9 +152,10 @@
                 data: {post_id: button_id, action: button_action},
                 success: function (response) {
                     console.log(response['msg'])
+                    window.location.reload();
                 }
             });
-            window.location.reload();
+
         }
 
 
@@ -171,11 +172,11 @@
                 data: {post_id: button_id, action: button_action},
                 success: function (response) {
                     console.log(response['msg'])
+                    window.location.reload();
                 }
             });
-             window.location.reload();
-        }
 
+        }
 
         // 게시글 삭제 이벤트
         function DeletePost() {
