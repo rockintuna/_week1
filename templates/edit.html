@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>고민 글 작성</title>
+
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- 구글 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <!-- Ajax CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- static CSS file load -->
+    <link rel="stylesheet" type="text/css" href="/static/post.css">
+
+    <script>
+
+        // 공감 버튼 눌렀을 때의 이벤트
+        function PushLikeButton() {
+            let button_value = $('#LikeButton').val().split(' ');
+            let button_action = button_value[0];
+            let button_id = button_value[1]
+
+            console.log(button_action, button_id)
+
+            $.ajax({
+                type: 'POST',
+                url: '/like',
+                data: {post_id: button_id, action: button_action},
+                success: function (response) {
+                    console.log(response['msg'])
+                    $('#LikeDiv').load(window.location.href + " #LikeDiv")
+                    $('#ArticleInfo').load(window.location.href + " #ArticleInfo")
+                }
+            });
+
+        }
+
+
+        // 비공감 버튼 이벤트
+        function PushUnLikeButton() {
+            let button_value = $('#UnLikeButton').val().split(' ');
+            let button_action = button_value[0];
+            let button_id = button_value[1];
+
+            console.log(button_action, button_id)
+            $.ajax({
+                type: 'POST',
+                url: '/like',
+                data: {post_id: button_id, action: button_action},
+                success: function (response) {
+                    console.log(response['msg'])
+                    $('#LikeDiv').load(window.location.href + " #LikeDiv")
+                    $('#ArticleInfo').load(window.location.href + " #ArticleInfo")
+                }
+            });
+
+        }
+
+        // 댓글 작성버튼에 대한 이벤트
+        function PostReplyButton() {
+            let reply = $('#ReplyComment').val();
+            let button_value = $('#ReplyButton').val();
+            let Today = TodayDate();
+
+            console.log(reply, button_value, Today);
+
+            if (reply != '') {
+                $.ajax({
+                    type: "POST",
+                    url: '/comment',
+                    data: {post_id: button_value, comment: reply, create_date: Today},
+                    success: function (response) {
+                        console.log(response['msg'])
+                        $('#ReplyComment').val('');
+                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+
+                    }
+                });
+            } else {
+                alert('댓글을 입력하세요.');
+            }
+        }
+
+        // 댓글 삭제 이벤트
+        function DeleteReply(CommentID) {
+            if (confirm("댓글을 삭제하시겠습니까?") == true) {
+                let PostID = '{{ post._id }}';
+
+                console.log(CommentID, PostID);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/comment',
+                    data: {post_id: PostID, comment_id: CommentID},
+                    success: function (response) {
+                        alert(response['msg'])
+                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+                    }
+                });
+            } else {
+                return;
+            }
+        }
+
+        // yyyy-mm-dd 형식 만들기
+        function TodayDate() {
+            var date = new Date();
+
+            // 년,월,일
+            var year = date.getFullYear();
+            var month = ("0" + (1 + date.getMonth())).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
+
+            // 시간, 분, 초
+            var hour = ("0" + date.getHours()).slice(-2);
+            var minute = ("0" + date.getMinutes()).slice(-2);
+            var second = ("0" + date.getSeconds()).slice(-2);
+
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+        }
+
+        // 게시글 삭제 이벤트
+        function DeletePost() {
+            if (confirm("글을 삭제하시겠습니까?") == true) {
+                let PostID = $('#DeletePost').val();
+                console.log(PostID);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/post',
+                    data: {post_id: PostID},
+                    success: function (response) {
+                        console.log(response['msg']);
+                        alert('게시글이 삭제되었습니다.')
+                        window.location.href = '/';
+                    },
+                    error: function (request) {
+                        if (request.status == 403) {
+                            alert("권한이 없습니다.");
+                        }
+                    }
+                });
+            } else {
+                return;
+            }
+        }
+
+
+        // 작성완료 버튼 이벤트
+        function EditPost() {
+            if (confirm("재판 수정을 완료하시겠습니까?")) {
+                console.log('네')
+            }
+            else {
+                return;
+            }
+        }
+
+
+    </script>
+
+    <style>
+        .top_banner_title {
+            font-family: 'Black Han Sans', sans-serif;
+            color: black;
+            font-size: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div>
+    <section class="hero is-primary">
+        <div class="hero-body" style="text-align: center;">
+            <p class="title">
+                <span style="font-size: 50px; color: black;">재판 수정</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="whole_post_page">
+        <div class="article">
+            <!-- 글 정보 -->
+            <div class="article_info" id="ArticleInfo">
+                <div class="article_author">
+                    <span>글쓴이: <strong>글쓴이임</strong></span>
+                </div>
+                <div class="article_data">
+                    <span>2021-09-16</span>
+                </div>
+                <div class="article_hit">
+                    <span>조회: <strong>0</strong> &nbsp;&nbsp;&nbsp; 추천: <strong>0</strong></span>
+                </div>
+            </div>
+
+            <!-- 글 제목 -->
+            <div class="article-title" style="margin-top: 30px;">
+                <input class="input" type="text" style="width: 60%;" value="돼지"></span>
+            </div>
+            <hr>
+
+            <!-- 글 상세내용 입니다 -->
+            <div class="article-content">
+                <textarea class="textarea" rows="20" ></textarea>
+            </div>
+            <hr>
+            <div style="text-align: center;">
+                <button class="button is-primary" onclick="EditPost()">작성 완료</button>
+            </div>
+        </div>
+        <div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
