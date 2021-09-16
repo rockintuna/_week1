@@ -148,6 +148,14 @@ def plus_post_view():
     db.post.update_one({'_id': ObjectId(post_id_receive)}, {'$inc': {'view': 1}})
     return jsonify({'msg': '조회수 추가.'})
 
+@app.route('/post/update')
+def load_update_page():
+    post_id_receive = request.args.get("post_id")
+    post_id_valid_check(post_id_receive)
+    post = db.post.find_one({'_id': ObjectId(post_id_receive)})
+    post["_id"] = str(post["_id"])
+    return render_template('edit.html', post=post)
+
 @app.route('/post', methods=['PUT'])
 def update_post():
     token_receive = request.cookies.get('mytoken')
