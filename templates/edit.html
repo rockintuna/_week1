@@ -42,8 +42,7 @@
             return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
         }
 
-
-        // 작성완료 버튼 이벤트
+        // 수정완료 버튼 이벤트
         function EditPost() {
             if (confirm("재판 수정을 완료하시겠습니까?")) {
 
@@ -70,6 +69,15 @@
             }
         }
 
+        // 수정취소 버튼 이벤트
+        function Cancel() {
+            if (confirm("수정을 취소하시겠습니까?") == true) {
+                window.location.href = '/post?post_id={{ post._id }}';
+            }
+            else {
+                return;
+            }
+        }
     </script>
 
     <style>
@@ -130,8 +138,8 @@
             </div>
             <hr>
             <div style="text-align: center;">
-                <button class="button is-primary edit_button"  onclick="EditPost()">작성 완료</button>
-                <button class="button is-danger cancel_button" onclick="EditPost()">작성 완료</button>
+                <button class="button is-primary edit_button"  onclick="EditPost()">수정 완료</button>
+                <button class="button is-danger cancel_button" onclick="Cancel()">수정 취소</button>
             </div>
         </div>
         <div>
