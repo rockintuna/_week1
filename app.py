@@ -42,7 +42,7 @@ def login_main():
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
-@app.route('/mypage_main')
+@app.route('/mypage')
 def mypage():
     token_receive = request.cookies.get('mytoken')
 
@@ -50,11 +50,18 @@ def mypage():
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
-            posts = list(db.post.find({'user_id': user}))
+
+            posts = list(db.post.find({'user_id': user["user_id"]}))
             for post in posts:
                 post["_id"] = str(post["_id"])
+                post["like"] = db.likes.count_documents({"post_id": post["_id"], "like": 1})
+                post["unlike"] = db.likes.count_documents({"post_id": post["_id"], "like": -1})
 
-            return render_template('index.html', posts=posts, id=user["user_id"])
+            comments = list(db.comment.find({'user_id': user["user_id"]}))
+            for comment in comments:
+                comment["_id"] = str(comment["_id"])
+
+            return render_template('index_temp_for_mypage.html', posts=posts, comments=comments, id=user["user_id"])
         except jwt.ExpiredSignatureError:
             msg = '로그인 시간이 만료되었습니다.'
             return render_template('error.html', msg=msg)
@@ -131,6 +138,8 @@ def get_post_list():
 
 @app.route('/post', methods=['GET'])
 def get_post():
+    token_receive = request.cookies.get('mytoken')
+
     post_id_receive = request.args.get("post_id")
     post_id_valid_check(post_id_receive)
     post = db.post.find_one({'_id': ObjectId(post_id_receive)})
@@ -142,7 +151,20 @@ def get_post():
 
     like_count = db.likes.count({"post_id": post_id_receive, "like": 1})
     unlike_count = db.likes.count({"post_id": post_id_receive, "like": -1})
-    return render_template('post.html', post=post, comments=comments, like_count=like_count, unlike_count=unlike_count)
+
+    if token_receive is not None:
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
+            return render_template('post.html', post=post, comments=comments, like_count=like_count, unlike_count=unlike_count, user_id=user["user_id"])
+        except jwt.ExpiredSignatureError:
+            msg = '로그인 시간이 만료되었습니다.'
+            return render_template('error.html', msg=msg)
+        except jwt.DecodeError:
+            msg = '로그인 정보가 존재하지 않습니다.'
+            return render_template('error.html', msg=msg)
+    else:
+        return render_template('post.html', post=post, comments=comments, like_count=like_count, unlike_count=unlike_count)
 
 @app.route('/post', methods=['POST'])
 def add_post():
