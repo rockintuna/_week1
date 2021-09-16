@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>고민 글 작성</title>
+
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- 구글 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <!-- Ajax CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- static CSS file load -->
+    <link rel="stylesheet" type="text/css" href="/static/post.css">
+
+    <script>
+
+        // yyyy-mm-dd 형식 만들기
+        function TodayDate() {
+            var date = new Date();
+
+            // 년,월,일
+            var year = date.getFullYear();
+            var month = ("0" + (1 + date.getMonth())).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
+
+            // 시간, 분, 초
+            var hour = ("0" + date.getHours()).slice(-2);
+            var minute = ("0" + date.getMinutes()).slice(-2);
+            var second = ("0" + date.getSeconds()).slice(-2);
+
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+        }
+
+        // 수정완료 버튼 이벤트
+        function EditPost() {
+            if (confirm("재판 수정을 완료하시겠습니까?")) {
+
+                let PostID = '{{ post._id }}';
+                let PostTitle = $('#EditTitle').val();
+                let PostContent = $('#EditContent').val();
+                let PostImage = '{{ post.image }}'
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/post',
+                    data: {post_id: PostID, title: PostTitle, content: PostContent , image: PostImage},
+                    success : function (response) {
+                        alert(response['msg']);
+                        window.location.href = '/post?post_id={{ post._id }}';
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+            }
+            else {
+                return;
+            }
+        }
+
+        // 수정취소 버튼 이벤트
+        function Cancel() {
+            if (confirm("수정을 취소하시겠습니까?") == true) {
+                window.location.href = '/post?post_id={{ post._id }}';
+            }
+            else {
+                return;
+            }
+        }
+    </script>
+
+    <style>
+        .top_banner_title {
+            font-family: 'Black Han Sans', sans-serif;
+            color: black;
+            font-size: 70px;
+        }
+        .post_title {
+            width: 60%;
+        }
+
+        .edit_button {
+            margin-right: 10px;
+        }
+
+        .cancel_button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <section class="hero is-primary">
+        <div class="hero-body" style="text-align: center;">
+            <p class="title">
+                <span style="font-size: 50px; color: black;">재판 수정</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="whole_post_page">
+        <div class="article">
+            <!-- 글 정보 -->
+            <div class="article_info" id="ArticleInfo">
+                <div class="article_author">
+                    <span>글쓴이: <strong>{{post.user_id}}</strong></span>
+                </div>
+                <div class="article_data">
+                    {% set date = (post.postDate | string).split(' ') %}
+                    {% set today = date[1].split(':') %}
+                    <span>{{ date[0] }}  {{ today[0] }}:{{ today[1] }}</span>
+                </div>
+                <div class="article_hit">
+                    <span>조회: <strong>{{ post.view }}</strong> &nbsp;&nbsp;&nbsp; 추천: <strong>0</strong></span>
+                </div>
+            </div>
+
+            <!-- 글 제목 -->
+            <div class="article-title" style="margin-top: 30px;">
+                <input class="input post_title" type="text" value="{{ post.title }}" id="EditTitle">
+            </div>
+            <hr>
+
+            <!-- 글 상세내용 입니다 -->
+            <div class="article-content">
+                <textarea class="textarea" rows="20" id="EditContent">{{ post.content }}</textarea>
+            </div>
+            <hr>
+            <div style="text-align: center;">
+                <button class="button is-primary edit_button"  onclick="EditPost()">수정 완료</button>
+                <button class="button is-danger cancel_button" onclick="Cancel()">수정 취소</button>
+            </div>
+        </div>
+        <div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

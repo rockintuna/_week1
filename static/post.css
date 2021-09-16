@@ -68,23 +68,35 @@
     font-family: 'Jua', sans-serif;
 }
 
-.LikeorUnlike {
+.Like-Unlike {
     height: 100px;
 
 }
 
-.LikeButton {
+.LikeButton-image {
     width: 80px;
     border-radius: 50%;
     cursor: pointer;
 }
 
-.UnlikeButton {
+.UnlikeButton-image {
     width: 88px;
     border-radius: 50%;
     cursor: pointer;
 }
 
 .reply-list {
-    margin-top: 50px;
+    margin-top: 150px;
+}
+
+.LikeButton-border {
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+.UnlikeButton-border {
+    padding: 0;
+    background: none;
+    border: none;
 }
