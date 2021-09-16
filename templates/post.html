@@ -92,57 +92,69 @@
             }
         }
 
-        // 댓글 삭제 작업중
-        function DeleteReply() {
+        // 댓글 삭제 이벤트
+        function DeleteReply(CommentID) {
             if (confirm("댓글을 삭제하시겠습니까?") == true) {
-                console.log($('#Comment_number').val());
+                let PostID = '{{ post._id }}';
+
+                console.log(CommentID, PostID);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/comment',
+                    data: {post_id: PostID, comment_id: CommentID},
+                    success: function (response) {
+                        alert(response['msg'])
+                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+                    }
+                });
             } else {
                 return;
             }
         }
 
-            // yyyy-mm-dd 형식 만들기
-            function TodayDate() {
-                var date = new Date();
+        // yyyy-mm-dd 형식 만들기
+        function TodayDate() {
+            var date = new Date();
 
-                // 년,월,일
-                var year = date.getFullYear();
-                var month = ("0" + (1 + date.getMonth())).slice(-2);
-                var day = ("0" + date.getDate()).slice(-2);
+            // 년,월,일
+            var year = date.getFullYear();
+            var month = ("0" + (1 + date.getMonth())).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
 
-                // 시간, 분, 초
-                var hour = ("0" + date.getHours()).slice(-2);
-                var minute = ("0" + date.getMinutes()).slice(-2);
-                var second = ("0" + date.getSeconds()).slice(-2);
+            // 시간, 분, 초
+            var hour = ("0" + date.getHours()).slice(-2);
+            var minute = ("0" + date.getMinutes()).slice(-2);
+            var second = ("0" + date.getSeconds()).slice(-2);
 
-                return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-            }
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+        }
 
-            // 게시글 삭제 이벤트
-            function DeletePost() {
-                if (confirm("글을 삭제하시겠습니까?") == true) {
-                    let PostID = $('#DeletePost').val();
-                    console.log(PostID);
+        // 게시글 삭제 이벤트
+        function DeletePost() {
+            if (confirm("글을 삭제하시겠습니까?") == true) {
+                let PostID = $('#DeletePost').val();
+                console.log(PostID);
 
-                    $.ajax({
-                        type: 'DELETE',
-                        url: '/post',
-                        data: {post_id: PostID},
-                        success: function (response) {
-                            console.log(response['msg']);
-                            alert('게시글이 삭제되었습니다.')
-                            window.location.href = '/';
-                        },
-                        error: function (request) {
-                            if (request.status == 403) {
-                                alert("권한이 없습니다.");
-                            }
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/post',
+                    data: {post_id: PostID},
+                    success: function (response) {
+                        console.log(response['msg']);
+                        alert('게시글이 삭제되었습니다.')
+                        window.location.href = '/';
+                    },
+                    error: function (request) {
+                        if (request.status == 403) {
+                            alert("권한이 없습니다.");
                         }
-                    });
-                } else {
-                    return;
-                }
+                    }
+                });
+            } else {
+                return;
             }
+        }
 
     </script>
 
@@ -167,17 +179,11 @@
             <div>
                 <button class="button is-link" onclick=window.location.href='/'>재판실로 돌아가기</button>
             </div>
-
-            <!-- 재판 수정, 재판 글 배너, 재판 삭제 -->
+            <!-- 재판 글 배너 -->
             <div>
-                <!-- 재판 수정 버튼 ------------------------------------------------------------------------------------>
-
-
-                <!-- 재판 글 배너 -->
                 <div class="post_title_div">
                     <span class="top_banner_title post_title">재판 글</span>
                 </div>
-
             </div>
         </div>
     </section>
@@ -250,27 +256,26 @@
 
             <!-- 댓글 리스트 입니다 -->
             <div class="reply-list" id="ReplyDiv">
-                <p>댓글 수 : <strong> {{ post.comments | length }}</strong></p>
+                <p>댓글 수 : <strong> {{ comments | length }}</strong></p>
                 <hr>
                 <div>
                     <ul class="reply-ul" id="ReplyList">
-                        {% for comment in post.comments%}
-                            {% set index = loop.index0 %}
+                        {% for comment in comments %}
                             <li class="reply-data">
                                 <div style="height: 35px;">
                                     <div style="float: left; width: 50%;">
                                 <span style="font-size: 17px;">
-                                {{ comment.id }}
+                                    {{ comment.user_id }}
                                 </span>
                                         <span style="color: gainsboro; font-size: 12px;">
                                     &nbsp;({{ comment.create_date }})
                                 </span>
                                     </div>
                                     <div style="float: right;">
-                                        <button class="button is-light" onclick="DeleteReply()"
-                                                id="Comment_number" value="{{ index }}">
+                                        <button class="button is-light" onclick="DeleteReply(this.value)"
+                                                id="Comment_number" value="{{ comment._id }}">
                                             <span style="font-size:10px;">
-                                                <strong>삭제 {{ index }}</strong>
+                                                <strong>삭제</strong>
                                             </span>
                                         </button>
                                     </div>
