@@ -18,17 +18,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 50px auto 50px;
+    margin: 0 auto 50px;
     height: 200px;
     width: 90%;
-    font-size: 70px;
+    font-size: 100px;
     font-family: "Hahmlet", serif;
-    background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 1) 0%,
-            rgba(163, 163, 163, 1) 100%
-    );
-    border: 1px solid gray;
+    /*background-image: url("../static/title.png");*/
+    /*background-size: cover;*/
+    border-bottom: 5px outset rgba(28, 110, 164, 0.09);
+    border-radius: 14px;
 }
 
 .container .buttons {
@@ -103,10 +101,22 @@
 }
 
 .sign {
+    display: flex;
+    justify-content: space-between;
     text-align: center;
+    height: 80px;
+    width: 100%;
+    background-color: #000000;
+}
+
+.logo{
+    left: 0;
+}
+
+.logo>img{
     width: 400px;
-    margin: 0 0 50px;
-    float: right;
+    height: 100%;
+    object-fit: cover;
 }
 
 .postListOne {
@@ -114,17 +124,26 @@
 }
 
 .loginBtn {
-    float: right;
+    width: 130px;
+    font-size: 1.5rem;
+    border-radius: 15px 0 0 15px;
 }
 
 .username {
     display: none;
+    align-items: center;
+    float: right;
+    background-color: gray;
     font-family: "Hahmlet", serif;
+    font-size: 20px;
+    color: white;
+    padding: 23px 0 0 10px;
 }
 
 .logoutBtn {
     margin: 0 20px;
     display: none;
+    float: right;
     cursor: pointer;
 }
 
@@ -139,12 +158,13 @@
     white-space: nowrap;
 }
 
-#allListText{
+#allListText {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-p{
+p {
     margin-bottom: 0;
 }
+

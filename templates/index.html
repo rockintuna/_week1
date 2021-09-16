@@ -47,17 +47,20 @@
 </head>
 
 <body>
-
-<div class="container">
-    <div class="sign">
-        <button onclick="window.location.replace('/login_main')" type="button"
-                class="btn btn-secondary loginBtn">로그인
-        </button>
-        <div class="username">어서오세요, {{ id }} 존경장님
-            <button class="logoutBtn btn-sm btn-outline-secondary" type="button" onclick="logout()">로그아웃</button>
-        </div>
+<div class="sign">
+    <div class="logo">
+        <img src="../static/title_white.png">
     </div>
-    <div class="title">재판하는 존경장님</div>
+    <button onclick="window.location.replace('/login_main')" type="button"
+            class="btn btn-secondary loginBtn">로그인
+    </button>
+    <div class="username"> <span> 어서오세요, {{ id }} 존경장님</span>
+        <button class="logoutBtn btn btn-outline-light" type="button" onclick="logout()">로그아웃</button>
+    </div>
+</div>
+<div class="container">
+
+    <div class="title">재판실</div>
     <div class="buttons">
         <button
                 type="button"
