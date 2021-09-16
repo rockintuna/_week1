@@ -201,7 +201,7 @@
             <!-- 글 정보 -->
             <div class="article_info" id="ArticleInfo">
                 <div class="article_author">
-                    <span>글쓴이: <strong>{{ post.id }}</strong></span>
+                    <span>글쓴이: <strong>{{ post.user_id }}</strong></span>
                 </div>
                 <div class="article_data">
                     {% set date =  (post.postDate | string).split(' ') %}
@@ -250,27 +250,25 @@
 
             <!-- 댓글 리스트 입니다 -->
             <div class="reply-list" id="ReplyDiv">
-                <p>댓글 수 : <strong> {{ post.comments | length }}</strong></p>
+                <p>댓글 수 : <strong>{{ comments | length }}</strong></p>
                 <hr>
                 <div>
                     <ul class="reply-ul" id="ReplyList">
-                        {% for comment in post.comments%}
-                            {% set index = loop.index0 %}
+                            {% for comment in comments %}
                             <li class="reply-data">
                                 <div style="height: 35px;">
                                     <div style="float: left; width: 50%;">
                                 <span style="font-size: 17px;">
-                                {{ comment.id }}
+                                    {{ comment.user_id }}
                                 </span>
                                         <span style="color: gainsboro; font-size: 12px;">
-                                    &nbsp;({{ comment.create_date }})
+                                    &nbsp;{{ comment.create_date }}
                                 </span>
                                     </div>
                                     <div style="float: right;">
-                                        <button class="button is-light" onclick="DeleteReply()"
-                                                id="Comment_number" value="{{ index }}">
+                                        <button class="button is-light" onclick="DeleteReply()">
                                             <span style="font-size:10px;">
-                                                <strong>삭제 {{ index }}</strong>
+                                                <strong>삭제</strong>
                                             </span>
                                         </button>
                                     </div>
@@ -280,8 +278,7 @@
                                 </div>
                                 <hr>
                             </li>
-                        {% endfor %}
-
+                            {% endfor %}
                     </ul>
                 </div>
             </div>
