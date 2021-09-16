@@ -238,14 +238,16 @@
 
 
              <!-- 공감 비공감 입니다 ------------------------------------------->
-            <div class="LikeorUnlike">
+            <div class="Like-Unlike">
                 <div style="text-align: center;">
-                    <button onclick="PushLikeButton()" value="like {{ post._id }}" id="LikeButton">
-                        <img src="/static/good_thumb.png" class="LikeButton">
+                    <button class="LikeButton-border" onclick="PushLikeButton()"
+                            value="like {{ post._id }}" id="LikeButton">
+                        <img src="/static/good_thumb.png" class="LikeButton-image">
                     </button>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button onclick="PushUnLikeButton()" id="UnLikeButton" value="unlike {{ post._id }}">
-                        <img src="/static/bad_thumb.png" class="UnlikeButton">
+                    <button class="UnlikeButton-border" onclick="PushUnLikeButton()"
+                            id="UnLikeButton" value="unlike {{ post._id }}">
+                        <img src="/static/bad_thumb.png" class="UnlikeButton-image">
                     </button>
 
                     <!-- 공감 비공감 텍스트입니다 -->
