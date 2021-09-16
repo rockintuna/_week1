@@ -110,7 +110,7 @@
                     error: function (e) {
                         alert(e.responseText);
                     }
-                    });
+                });
             } else {
                 return;
             }
@@ -158,6 +158,8 @@
                 return;
             }
         }
+
+        // 게시글 수정 이벤트
 
     </script>
 
@@ -218,22 +220,25 @@
             </div>
             <hr>
 
-            <!-- 공감 비공감 입니다 ------------------------------------------------------>
-            <div class="LikeorUnlike">
-                <div>
-                    <div style="border: 1px solid white; float: left; width: 50%;">
-                        <div class="revise_post" onclick="window.location.href='/update_post'">
-                            <button class="button is-warning">
-                                <span><strong>재판 수정</strong></span>
-                            </button>
-                        </div>
-                    </div>
-                    <div style="border: 1px solid white; float: left; width: 50%; text-align: right">
-                        <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
-                            <span style="color: black;"><strong>재판 삭제</strong></span>
+            <!-- 재판 수정, 재판 삭제 -->
+            <div>
+                <div style="border: 1px solid white; float: left; width: 50%;">
+                    <div class="revise_post" onclick="window.location.href='/post/update?post_id={{ post._id }}'">
+                        <button class="button is-warning">
+                            <span><strong>재판 수정</strong></span>
                         </button>
                     </div>
                 </div>
+                <div style="border: 1px solid white; float: left; width: 50%; text-align: right">
+                    <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
+                        <span style="color: black;"><strong>재판 삭제</strong></span>
+                    </button>
+                </div>
+            </div>
+
+
+             <!-- 공감 비공감 입니다 ------------------------------------------->
+            <div class="LikeorUnlike">
                 <div style="text-align: center;">
                     <button onclick="PushLikeButton()" value="like {{ post._id }}" id="LikeButton">
                         <img src="/static/good_thumb.png" class="LikeButton">
