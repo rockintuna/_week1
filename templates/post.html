@@ -106,8 +106,11 @@
                     success: function (response) {
                         alert(response['msg'])
                         $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
                     }
-                });
+                    });
             } else {
                 return;
             }
@@ -159,8 +162,6 @@
     </script>
 
     <style>
-
-
         .post_title_div {
             text-align: center;
         }
@@ -193,7 +194,7 @@
             <!-- 글 정보 -->
             <div class="article_info" id="ArticleInfo">
                 <div class="article_author">
-                    <span>글쓴이: <strong>{{ post.id }}</strong></span>
+                    <span>글쓴이: <strong>{{ post.user_id }}</strong></span>
                 </div>
                 <div class="article_data">
                     {% set date =  (post.postDate | string).split(' ') %}
