@@ -20,6 +20,7 @@
     margin: 50px;
 }
 
+
 /*
 .inputs {
   width: 60%;
@@ -62,25 +63,3 @@ button {
     cursor: pointer;
 }
 
-@media screen and (max-width: 1300px) {
-    .container {
-        width: 100%;
-        margin: 10vh auto;
-    }
-
-    .inputs {
-        width: 100%;
-    }
-
-    input {
-        margin: 10px auto;
-    }
-
-    button {
-        margin: 50px auto;
-    }
-
-    .title {
-        font-size: 1.5rem;
-    }
-}
