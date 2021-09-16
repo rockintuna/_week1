@@ -1,5 +1,5 @@
 from bson import ObjectId
-from flask import Flask, render_template, jsonify, request, abort
+from flask import Flask, render_template, jsonify, request, abort, Response
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import jwt
@@ -42,14 +42,13 @@ def login_main():
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
-
 @app.route('/register', methods=['POST'])
 def register_user():
     user_id_receive = request.form['user_id']
     pw_receive = request.form['pw']
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
     if is_user_id_exist(user_id_receive):
-        abort(400, msg='이미 존재하는 ID 입니다. 중복 확인을 다시 해주세요.')
+        return Response(response='이미 존재하는 ID 입니다. 중복 확인을 다시 해주세요.', status=400)
     else:
         doc = {
             "user_id": user_id_receive,
@@ -163,11 +162,12 @@ def update_post():
         image_receive = request.form['image']
 
         post_id_valid_check(post_id_receive)
-        post_owner_check(post_id_receive, user)
-        db.post.update_one({'_id': ObjectId(post_id_receive)},
-                           {'$set': {'title': title_receive, 'content': content_receive, 'image': image_receive}})
-
-        return jsonify({'msg': '고민이 수정되었습니다.'})
+        if is_post_owner(post_id_receive, user):
+            db.post.update_one({'_id': ObjectId(post_id_receive)},
+                               {'$set': {'title': title_receive, 'content': content_receive, 'image': image_receive}})
+            return jsonify({'msg': '고민이 수정되었습니다.'})
+        else:
+            return Response(response='해당 글에 대한 권한이 없습니다.', status=403)
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
         return render_template('error.html', msg=msg)
@@ -186,10 +186,12 @@ def delete_post():
         post_id_receive = request.form['post_id']
 
         post_id_valid_check(post_id_receive)
-        post_owner_check(post_id_receive, user)
-        db.post.delete_one({'_id': ObjectId(post_id_receive)})
+        if is_post_owner(post_id_receive, user):
+            db.post.delete_one({'_id': ObjectId(post_id_receive)})
+            return jsonify({'msg': '고민이 삭제되었습니다.'})
+        else:
+            return Response(response='해당 글에 대한 권한이 없습니다.', status=403)
 
-        return jsonify({'msg': '고민이 삭제되었습니다.'})
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
         return render_template('error.html', msg=msg)
@@ -239,10 +241,12 @@ def delete_comment():
         comment_id_receive = request.form['comment_id']
 
         post_id_valid_check(post_id_receive)
-        comment_owner_check(comment_id_receive, user)
 
-        db.comment.delete_one({'_id': ObjectId(comment_id_receive)})
-        return jsonify({'msg': '댓글이 제거되었습니다.'})
+        if is_comment_owner(comment_id_receive, user):
+            db.comment.delete_one({'_id': ObjectId(comment_id_receive)})
+            return jsonify({'msg': '댓글이 제거되었습니다.'})
+        else:
+            return Response(response='해당 댓글에 대한 권한이 없습니다.', status=403)
     except jwt.ExpiredSignatureError:
         msg = '로그인 시간이 만료되었습니다.'
         return render_template('error.html', msg=msg)
@@ -296,24 +300,20 @@ def like_post():
         return render_template('error.html', msg=msg)
 
 def is_user_id_exist(user_id):
-    return list(db.users.find({'user_id': user_id})).count() != 0;
+    return db.users.find_one({'user_id': user_id}) is not None
 
 def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:
         abort(404)
     return
 
-def post_owner_check(post_id, user):
+def is_post_owner(post_id, user):
     post = db.post.find_one({'_id': ObjectId(post_id)})
-    if post["user_id"] != user["user_id"]:
-        abort(403)
-    return
+    return post["user_id"] == user["user_id"]
 
-def comment_owner_check(comment_id, user):
+def is_comment_owner(comment_id, user):
     comment = db.comment.find_one({'_id': ObjectId(comment_id)})
-    if comment["user_id"] != user["user_id"]:
-        abort(403)
-    return
+    return comment["user_id"] == user["user_id"]
 
 @app.errorhandler(404)
 def page_not_found(e):
