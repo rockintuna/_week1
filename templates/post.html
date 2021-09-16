@@ -92,10 +92,22 @@
             }
         }
 
-        // 댓글 삭제 작업중
-        function DeleteReply() {
+        // 댓글 삭제 이벤트
+        function DeleteReply(CommentID) {
             if (confirm("댓글을 삭제하시겠습니까?") == true) {
-                console.log($('#Comment_number').val());
+                let PostID = '{{ post._id }}';
+
+                console.log(CommentID, PostID);
+
+                $.ajax ({
+                    type: 'DELETE',
+                    url: '/comment',
+                    data: {post_id: PostID, comment_id: CommentID},
+                    success : function (response) {
+                        alert(response['msg'])
+                        $('#ReplyDiv').load(window.location.href + " #ReplyDiv")
+                    }
+                });
             } else {
                 return;
             }
@@ -266,7 +278,8 @@
                                 </span>
                                     </div>
                                     <div style="float: right;">
-                                        <button class="button is-light" onclick="DeleteReply()">
+                                        <button class="button is-light" onclick="DeleteReply(this.value)"
+                                                id="ReplyDeleteButton" value="{{ comment._id }}">
                                             <span style="font-size:10px;">
                                                 <strong>삭제</strong>
                                             </span>
