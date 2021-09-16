@@ -49,8 +49,7 @@ def register_user():
     pw_receive = request.form['pw']
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
     if is_user_id_exist(user_id_receive):
-        abort(400, {'msg': '이미 존재하는 ID 입니다.'})
-        return
+        abort(400, msg='이미 존재하는 ID 입니다. 중복 확인을 다시 해주세요.')
     else:
         doc = {
             "user_id": user_id_receive,
@@ -105,7 +104,7 @@ def get_post():
     post = db.post.find_one({'_id': ObjectId(post_id_receive)})
     post["_id"] = str(post["_id"])
 
-    comments = db.comment.find({'post_id': post_id_receive})
+    comments = list(db.comment.find({'post_id': post_id_receive}))
     for comment in comments:
         comment["_id"] = str(comment["_id"])
 
@@ -297,7 +296,7 @@ def like_post():
         return render_template('error.html', msg=msg)
 
 def is_user_id_exist(user_id):
-    return db.users.find_one({'user_id': user_id}) is not None
+    return list(db.users.find({'user_id': user_id})).count() != 0;
 
 def post_id_valid_check(post_id):
     if db.post.find_one({'_id': ObjectId(post_id)}) is None:

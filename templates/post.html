@@ -147,16 +147,10 @@
     </script>
 
     <style>
-        .revise_post {
-            float: left;
-            text-align: right;
-            width: 30%;
-        }
+
 
         .post_title_div {
-            float: left;
             text-align: center;
-            width: 40%
         }
 
         .post_title {
@@ -176,22 +170,14 @@
 
             <!-- 재판 수정, 재판 글 배너, 재판 삭제 -->
             <div>
-                <!-- 재판 수정 버튼 -->
-                <div class="revise_post">
-                    <button class="button is-warning">
-                        <span><strong>재판 수정</strong></span>
-                    </button>
-                </div>
+                <!-- 재판 수정 버튼 ------------------------------------------------------------------------------------>
+
 
                 <!-- 재판 글 배너 -->
                 <div class="post_title_div">
                     <span class="top_banner_title post_title">재판 글</span>
                 </div>
-                <div style="float: left; text-align: left; width: 30%;">
-                    <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
-                        <span style="color: black;"><strong>재판 삭제</strong></span>
-                    </button>
-                </div>
+
             </div>
         </div>
     </section>
@@ -225,8 +211,22 @@
             </div>
             <hr>
 
-            <!-- 공감 비공감 입니다 -->
+            <!-- 공감 비공감 입니다 ------------------------------------------------------>
             <div class="LikeorUnlike">
+                <div>
+                    <div style="border: 1px solid white; float: left; width: 50%;">
+                        <div class="revise_post" onclick="window.location.href='/update_post'">
+                            <button class="button is-warning">
+                                <span><strong>재판 수정</strong></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="border: 1px solid white; float: left; width: 50%; text-align: right">
+                        <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
+                            <span style="color: black;"><strong>재판 삭제</strong></span>
+                        </button>
+                    </div>
+                </div>
                 <div style="text-align: center;">
                     <button onclick="PushLikeButton()" value="like {{ post._id }}" id="LikeButton">
                         <img src="/static/good_thumb.png" class="LikeButton">
