@@ -58,6 +58,7 @@
         }
     </style>
     <script>
+        let myPostList = null;
         function mypage() {
             $('.mypageBtn').hide()
             $('.mainpageBtn').show()
@@ -67,14 +68,17 @@
             $('#myJudge').show()
             $('#myComment').show()
 
-            $('.list-all').empty()
+            $('.bests').empty()
+            $('.lists').empty()
+            $('#pagination').empty()
+            $('#demo').empty()
             $.ajax({
                 type: "GET",
                 url: `/posts?user_id=test`,
                 async: false,
                 data: {},
                 success: function (response) {
-                    postList = response['posts'];
+                    myPostList = response['posts'];
                     printMyPosts();
                 }
             })
@@ -87,7 +91,7 @@
         function printMyPosts() {
             $("#demo").pagination({
                 pageSize: "7",
-                dataSource: postList.reverse(),
+                dataSource: myPostList.reverse(),
                 callback: function (data, pagination) {
                     let dataHtml = ``;
 
@@ -122,6 +126,7 @@
                 },
             });
         }
+
     </script>
 
 </head>
@@ -151,6 +156,14 @@
         </button>
         <button
                 type="button"
+                class="btn btn-dark btn-lg btn-block"
+                id="doJudge"
+                style="margin-top: 0px"
+        >
+            재판하기⚖️
+        </button>
+        <button
+                type="button"
                 class="btn btn-light btn-lg btn-block"
                 id="myJudge"
                 style="border: 1px solid black; margin-top: 0; display: none"
@@ -160,18 +173,10 @@
         <button
                 type="button"
                 class="btn btn-dark btn-lg btn-block"
-                id="doJudge"
-                style="margin-top: 0px"
-        >
-            재판하기⚖️
-        </button>
-        <button
-                type="button"
-                class="btn btn-dark btn-lg btn-block"
                 id="myComment"
                 style="margin-top: 0px; display: none"
         >
-            나의 댓글️
+            --------
         </button>
     </div>
     <!-- 재판하기 리스트 출력 -->
@@ -298,6 +303,21 @@
         $(".post-container").show();
     });
 
+    // 나의 재판 불러오기
+    $("#myJudge").click(function () {
+        $('#pagination').empty()
+        $('#demo').empty()
+        $.ajax({
+            type: "GET",
+            url: `/posts?user_id=test`,
+            async: false,
+            data: {},
+            success: function (response) {
+                myPostList = response['posts'];
+                printMyPosts();
+            }
+        })
+    });
 
     // 날짜 데이터 변환
     function formatMonth(date) {
