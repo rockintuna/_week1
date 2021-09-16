@@ -229,65 +229,44 @@
 
     }
 
+    //최신목록 출력
     function printPosts() {
         $("#demo").pagination({
             pageSize: "7",
             dataSource: postList.reverse(),
             callback: function (data, pagination) {
-                let dataHtml = ``;
-
-                /*$.each(data, function (index, item) {
-                    dataHtml +=
-                        `<div id="clickPost">
-                                    <li
-                                      class="
-                                        list-group-item
-                                        d-flex
-                                        justify-content-between
-                                        align-items-center
-                                      "
-                                    >` +
-                        ` <p id="allListText">${item["title"]}</p>` +
-                        `<span class="badge badge-primary badge-pill">${item["like"]}</span>
-                                </li>
-                        </div>`;
-                    if (!dataHtml) {
-                        return;
-                    }
-                    $("#clickPost").click(() => {
-                        onClickPost((item['_id']))
-                    })
-                    $("#pagination").html(dataHtml);
-                });*/
-
+                let allListData = ``;
+                if ($("#pagination").length) {
+                    $("#pagination").text('');
+                }
                 for (let i = 0; i < data.length; i++) {
                     (function (data) {
-
-                        var dataHtml =
+                        allListData =
                             $(`<div class="clickPost">
-                                    <li
-                                      class="
-                                        list-group-item
-                                        d-flex
-                                        justify-content-between
-                                        align-items-center
-                                      "
-                                    >` +
+                                            <li
+                                              class="
+                                                list-group-item
+                                                d-flex
+                                                justify-content-between
+                                                align-items-center
+                                              "
+                                            >` +
                                 ` <p id="allListText">${data["title"]}</p>` +
                                 `<span class="badge badge-primary badge-pill">${data["like"]}</span>
-                                </li>
-                        </div>`);
+                                        </li>
+                                </div>`);
 
-                        dataHtml.unbind("click")
-                        dataHtml.bind("click", function () {
+                        allListData.unbind("click")
+                        allListData.bind("click", function () {
                             onClickPost(data['_id'])
                         })
 
-                        $("#pagination").append(dataHtml);
-                        dataHtml = '';
+                        $("#pagination").append(allListData);
+                        allListData = '';
                     })(data[i])
 
                 }
+
             },
         });
 
@@ -296,33 +275,8 @@
         todayPosts.sort((a, b) => b.like - a.like)
         let todayData = '';
 
-
-        /*
         for (let i = 0; i < todayPosts.length; i++) {
-
-        if (i > 2) return;
-        todayData +=
-            `<div id="clickTodayPost">
-                                <li
-                                  class="
-                                    list-group-item
-                                    d-flex
-                                    justify-content-between
-                                    align-items-center
-                                  "
-                                >` +
-            `<p id="todayText">${todayPosts[i]["title"]}<p>` +
-            `<span class="badge badge-primary badge-pill">${todayPosts[i]["like"]}</span>
-                            </li>
-                    </div>`;
-        if (!todayData) {
-            return;
-        }
-        $("#clickTodayPost").click({id: todayPosts[i]['_id']}, onClickPost)
-        }
-         */
-        for (let i = 0; i < todayPosts.length; i++) {
-            if(i>2) break;
+            if (i > 2) break;
             (function (data) {
                 var dataHtml = '';
                 dataHtml =
@@ -388,11 +342,9 @@
             return false;
         });
         weeklyPosts.sort((a, b) => b.like - a.like)
-        console.log(weeklyPosts)
-
 
         for (let i = 0; i < weeklyPosts.length; i++) {
-            if(i>2) break;
+            if (i > 2) break;
             (function (data) {
                 var dataHtml = '';
                 dataHtml =
