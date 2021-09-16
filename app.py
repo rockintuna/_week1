@@ -26,6 +26,34 @@ def main():
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
+            return render_template('index_temp.html', posts=posts, id=user["user_id"])
+        except jwt.ExpiredSignatureError:
+            msg = '로그인 시간이 만료되었습니다.'
+            return render_template('error.html', msg=msg)
+        except jwt.DecodeError:
+            msg = '로그인 정보가 존재하지 않습니다.'
+            return render_template('error.html', msg=msg)
+    else:
+        return render_template('index_temp.html', posts=posts)
+
+
+@app.route('/login_main')
+def login_main():
+    msg = request.args.get("msg")
+    return render_template('login.html', msg=msg)
+
+@app.route('/mypage_main')
+def mypage():
+    token_receive = request.cookies.get('mytoken')
+
+    if token_receive is not None:
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user = db.users.find_one({"user_id": payload["user_id"]}, {'_id': False})
+            posts = list(db.post.find({'user_id': user}))
+            for post in posts:
+                post["_id"] = str(post["_id"])
+
             return render_template('index.html', posts=posts, id=user["user_id"])
         except jwt.ExpiredSignatureError:
             msg = '로그인 시간이 만료되었습니다.'
@@ -34,13 +62,7 @@ def main():
             msg = '로그인 정보가 존재하지 않습니다.'
             return render_template('error.html', msg=msg)
     else:
-        return render_template('index.html', posts=posts)
-
-
-@app.route('/login_main')
-def login_main():
-    msg = request.args.get("msg")
-    return render_template('login.html', msg=msg)
+        return render_template('index.html')
 
 @app.route('/register', methods=['POST'])
 def register_user():
