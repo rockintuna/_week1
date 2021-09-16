@@ -159,8 +159,22 @@
             }
         }
 
-        // 게시글 수정 이벤트
 
+        // 게시글 수정 이벤트
+        function EditPostButton() {
+            let login_user = '{{ user_id }}';
+            let author = '{{ post.user_id }}';
+
+            if (login_user == author) {
+                if (confirm("재판 글을 수정하시겠습니까?")) {
+                    window.location.href = '/post/update?post_id={{ post._id }}';
+                } else {
+                    return;
+                }
+            } else {
+                alert('해당 글에 대한 권한이 없습니다.');
+            }
+        }
     </script>
 
     <style>
@@ -221,15 +235,11 @@
             <hr>
 
             <!-- 재판 수정, 재판 삭제 -->
-            <div>
-                <div style="border: 1px solid white; float: left; width: 50%;">
-                    <div class="revise_post" onclick="window.location.href='/post/update?post_id={{ post._id }}'">
-                        <button class="button is-warning">
-                            <span><strong>재판 수정</strong></span>
-                        </button>
-                    </div>
-                </div>
-                <div style="border: 1px solid white; float: left; width: 50%; text-align: right">
+            <div style="text-align: center; height: 70px; display: block;">
+                <div style="padding-top: 10px;">
+                    <button style="margin-right:30px;" class="button is-warning" onclick="EditPostButton()">
+                        <span><strong>재판 수정</strong></span>
+                    </button>
                     <button class="button is-danger" onclick="DeletePost()" value="{{ post._id }}" id="DeletePost">
                         <span style="color: black;"><strong>재판 삭제</strong></span>
                     </button>
@@ -237,7 +247,7 @@
             </div>
 
 
-             <!-- 공감 비공감 입니다 ------------------------------------------->
+            <!-- 공감 비공감 입니다 ------------------------------------------->
             <div class="Like-Unlike">
                 <div style="text-align: center;">
                     <button class="LikeButton-border" onclick="PushLikeButton()"
